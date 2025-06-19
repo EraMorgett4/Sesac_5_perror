@@ -4,54 +4,10 @@
 
 ---
 
-## 📌 프로젝트 아이디어 제안 절차
+## 프로젝트 개요
 
-### 1️⃣ Step 1. 관심 주제 및 데이터 공유
+githubwiki(https://github.com/EraMorgett4/Sesac_5_perror/wiki)
 
-- 분석하고 싶은 사회적 이슈나 주제를 자유롭게 제안합니다.
-- 활용하고자 하는 공공 데이터가 있다면 해당 링크와 함께 공유합니다.
-
-> 예시:
-> - [서울시 공공자전거 이용정보](https://data.seoul.go.kr/dataList/OA-15467/S/1/)
-> - [기상청 기온 데이터](https://data.kma.go.kr/)
-
----
-
-### 2️⃣ Step 2. 데이터 활용 방안 구상
-
-- 데이터를 활용한 **개략적인 분석 흐름 또는 시스템 구조**를 구상합니다.
-- 예시 표현 방식:
-    - 데이터 파이프라인: 수집 → 정제 → 분석 → 시각화/서비스화
-    - 마인드맵: 문제 중심 → 관련 변수 도출 → 기대 효과 흐름
-
-> 사용 도구 예시: Canva, Gradio, Notion 등 자유롭게 활용
-
----
-
-### 3️⃣ Step 3. 아이디어 공유 및 팀 피드백
-
-- 구체적이지 않아도 괜찮습니다. **키워드 수준의 아이디어**도 환영합니다.
-- 공유한 아이디어는 Notion 또는 Google Docs에 정리해 팀원들과 함께 토론하고 구체화합니다.
-
----
-
-## 💡 제안 아이디어 예시
-
-### 📊 서울 시민생활 데이터를 활용한 1인가구 군집 분석
-
-- **목표**: 주거 지역, 연령, 이동성, 서비스 이용량 등을 바탕으로 서울시 1인 가구를 군집화
-- **활용 데이터**:
-    - 서울 시민생활 데이터 매뉴얼 PDF
-    - 지수 예: 커뮤니케이션 지수, 이동지수, 재정지수, OTT 소비지수 등
-- **분석 기법**:
-    - PCA → KMeans → 지도 시각화 (Folium)
-    - 군집별 특성 분석 → 행정동 기반 정책 제안
-- **기대 효과**:
-    - 고립 예방 및 복지 연계 정책 수립에 기여
-    - 데이터 기반의 공공서비스 개선 제안
-
-📎 관련 자료:
-- [(첨부) 서울 시민생활 데이터 매뉴얼 PDF](attachment:18693b00-250f-4a1f-bba4-de71dae99a21:(첨부3)_서울_시민생활_데이터_매뉴얼.pdf)
 
 ---
 
@@ -96,17 +52,17 @@
 ### 🌿 브랜치 네이밍 규칙
 
 ```
-prefix/이름-작업내용
+prefix/이름/작업내용
 ```
 
 | prefix      | 설명    | 예시                               |
 | ----------- | ----- | -------------------------------- |
-| `feature/`  | 기능 개발 | `feature/jiyoon-kmeans-analysis` |
-| `fix/`      | 버그 수정 | `fix/sunwoo-missing-data`        |
-| `docs/`     | 문서 관련 | `docs/jiyoon-readme-update`      |
-| `refactor/` | 구조 개선 | `refactor/jiyoon-preprocessing`  |
-| `test/`     | 테스트   | `test/jiyoon-model-eval`         |
-| `chore/`    | 설정 작업 | `chore/sunwoo-env-setup`         |
+| `feature/`  | 기능 개발 | `feature/sunwoo/kmeans-analysis` |
+| `fix/`      | 버그 수정 | `fix/sunwoo/missing-data`        |
+| `docs/`     | 문서 관련 | `docs/sunwoo/readme-update`      |
+| `refactor/` | 구조 개선 | `refactor/sunwoo/preprocessing`  |
+| `test/`     | 테스트   | `test/sunwoo/model-eval`         |
+| `chore/`    | 설정 작업 | `chore/sunwoo/env-setup`         |
 
 > 모든 작업은 `develop` 브랜치에서 분기하여 Pull Request(PR)로 병합합니다.
 
@@ -124,5 +80,6 @@ prefix/이름-작업내용
 ---
 
 ## **반드시 지켜주세요**
+
 1. 작업 후 제때제때 커밋하기
 2. 최종 PR을 날릴때, 커밋메시지 종합하여 `log.md`파일에 기록하기
