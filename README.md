@@ -6,7 +6,7 @@
 
 ## 프로젝트 개요
 
-githubwiki(https://github.com/EraMorgett4/Sesac_5_perror/wiki)
+[깃허브 위키](https://github.com/EraMorgett4/Sesac_5_perror/wiki)
 
 
 ---
