@@ -1,0 +1,208 @@
+.route-search-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+.search-panel {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: fit-content;
+}
+
+.search-panel h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.search-form {
+  margin-bottom: 30px;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 10px;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.current-location-btn {
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s;
+}
+
+.current-location-btn:hover {
+  background-color: #d35400;
+}
+
+.search-btn {
+  width: 100%;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  margin-top: 15px;
+}
+
+.search-btn:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+.search-btn:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.places-help {
+  margin-bottom: 30px;
+}
+
+.places-help h3 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.place-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s;
+}
+
+.place-btn:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.route-info {
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.route-info h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.route-details p {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.avoided-zones {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #fff5f5;
+  border-radius: 4px;
+  border-left: 4px solid #e74c3c;
+}
+
+.avoided-zones h4 {
+  color: #c0392b;
+  margin-bottom: 10px;
+}
+
+.avoided-zones ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.avoided-zones li {
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.map-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .main-content {
+    padding: 10px;
+  }
+  
+  .nav-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .nav-menu {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .dashboard-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .map-header {
+    flex-direction: column;
+  }
+  
+  .route-search-container {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .places-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .auth-card {
+    padding: 30px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-container {
+    padding: 0 10px;
+  }
+  
+  .nav-logo {
+    font-size: 1.2rem;
+  }
+  
+  .main-content {
+    padding: 5px;
+  }
+  
+  .dashboard {
+    padding: 10px;
+  }
+  
+  .risk-map-container,
+  .route-search-container {
+    padding: 10px;
+  }
+}
