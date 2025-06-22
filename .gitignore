@@ -1,1 +1,81 @@
+# 🔐 환경변수 및 보안 파일
 .env
+.env.local
+.env.production
+.env.staging
+*.key
+config/secrets.json
+
+# 🗄️ 데이터베이스 파일
+*.db
+*.sqlite
+*.sqlite3
+data/processed/
+data/cache/
+
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 📊 Jupyter Notebook
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# 🔧 IDE 및 에디터
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 📱 로그 파일
+*.log
+logs/
+
+# 🗂️ 임시 파일
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# 🔄 Node.js (프론트엔드용)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 📦 패키지 관리
+.coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+
+# 🚀 배포 관련
+.vercel
+.netlify
