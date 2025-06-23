@@ -51,3 +51,10 @@
   - Style: Dashboard - 원형 위험도 점수 표시기 스타일링
   - Style: RiskMap - 위험도별 색상 구분 범례 스타일링
   - Style: RouteSearch - 검색 제안 드롭다운 UI 스타일링
+
+### 06/23
+
+- 오병주
+  - Remove gitkeep 제거
+  - Add 싱크홀 신고정보 가진 rag llm rag에 없는 정보는 일반 llm에 질문
+  - Docs rag 문서 생성
