@@ -79,3 +79,7 @@ yarn-error.log*
 # 🚀 배포 관련
 .vercel
 .netlify
+
+node_modules/
+__pycache__/
+sinkhole_app.db
