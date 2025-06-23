@@ -1,0 +1,297 @@
+/* frontend/src/styles/Dashboard.css에 추가할 스타일 */
+
+/* 검색 방식 선택기 */
+.search-mode-selector {
+  margin-bottom: 20px;
+}
+
+.mode-buttons {
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  background: #f8f9fa;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 15px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-size: 14px;
+  color: #666;
+}
+
+.mode-btn.active {
+  background: #3498db;
+  color: white;
+}
+
+.mode-btn:hover:not(.active) {
+  background: #e9ecef;
+}
+
+/* 검색 입력 컨테이너 (RouteSearch와 동일) */
+.search-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input-container input {
+  width: 100%;
+}
+
+/* 검색 제안 드롭다운 */
+.suggestions-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.suggestion-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.suggestion-item:hover {
+  background-color: #f8f9fa;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.place-name {
+  font-weight: 500;
+  color: #2c3e50;
+  margin-bottom: 2px;
+}
+
+.place-address {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* 입력 필드 포커스 시 */
+.search-input-container input:focus {
+  border-radius: 4px 4px 0 0;
+}
+
+/* 기존 스타일 개선 */
+.manual-location-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.manual-location-card h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.manual-location-card button[type="submit"] {
+  width: 100%;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+.manual-location-card button[type="submit"]:hover:not(:disabled) {
+  background-color: #219a52;
+}
+
+.manual-location-card button[type="submit"]:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* 위험도 결과 개선 */
+.risk-result {
+  text-align: center;
+  padding: 20px;
+}
+
+.risk-score {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  color: white;
+  font-weight: bold;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s;
+}
+
+.risk-score:hover {
+  transform: scale(1.05);
+}
+
+.score-value {
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+.risk-level {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+.risk-message {
+  color: #555;
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+/* 현재 위치 카드 개선 */
+.current-location-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.current-location-card h2 {
+  color: white;
+  margin-bottom: 15px;
+}
+
+.location-info p {
+  margin-bottom: 8px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.refresh-btn {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: all 0.3s;
+}
+
+.refresh-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* 반응형 대응 */
+@media (max-width: 768px) {
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .mode-buttons {
+    flex-direction: column;
+  }
+  
+  .mode-btn {
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .mode-btn:last-child {
+    border-bottom: none;
+  }
+  
+  .suggestions-dropdown {
+    max-height: 150px;
+  }
+  
+  .suggestion-item {
+    padding: 10px;
+  }
+  
+  .risk-score {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .score-value {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard {
+    padding: 10px;
+  }
+  
+  .current-location-card,
+  .risk-prediction-card,
+  .manual-location-card {
+    padding: 15px;
+  }
+  
+  .risk-score {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .score-value {
+    font-size: 1.3rem;
+  }
+  
+  .risk-level {
+    font-size: 0.8rem;
+  }
+}
