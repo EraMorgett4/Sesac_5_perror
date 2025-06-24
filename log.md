@@ -72,3 +72,17 @@
 
 - 전호연
   - Add: FR-007 Azure Custom Vision으로 이미지 트레이닝 후 개체 감지 테스트
+
+- 황선우
+  - Chore: csv파일 업로드
+  - Chore : gitignore, requirement 업데이트
+  - Test : 카카오맵 api 테스트
+  - Add : FR-005 파일 추가(수정중)
+  - Fix : 주소 추출 로직 개선
+  - Fix : FR-005 로직 수정
+  - Chore : 파일 경로 변경
+  - Docs : gitignore 내용 수정
+  - Add : 데이터 전처리(도로공사데이터) 기능 추가
+  - Add : FR-005 기능 추가 
+  - Chore : 구동 확인 위한 임시 환경 구성
+  - Chore : 임시환경 파일삭제
