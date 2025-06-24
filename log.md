@@ -58,3 +58,8 @@
   - Remove gitkeep 제거
   - Add 싱크홀 신고정보 가진 rag llm rag에 없는 정보는 일반 llm에 질문
   - Docs rag 문서 생성
+
+  ### 06/24
+
+- 전호연
+  - Add: FR-007 Azure Custom Vision으로 이미지 트레이닝 후 개체 감지 테스트
