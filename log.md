@@ -58,3 +58,5 @@
   - Remove gitkeep 제거
   - Add 싱크홀 신고정보 가진 rag llm rag에 없는 정보는 일반 llm에 질문
   - Docs rag 문서 생성
+- 전호연
+  - Add: OpenAI와 TTS 연동 기능 추가
