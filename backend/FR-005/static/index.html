@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>위치 정보 전송 앱</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .location-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .button-group {
+            margin: 30px 0;
+        }
+
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .data-display {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: left;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .coordinate {
+            margin: 5px 0;
+        }
+
+        .coordinate span {
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 현재 위치 정보 전송</h1>
+        
+        <div class="location-info">
+            <p>Geolocation API를 사용하여 현재 위치를 가져오고<br>FastAPI 백엔드로 전송합니다.</p>
+        </div>
+
+        <div class="button-group">
+            <button id="getLocationBtn" onclick="getCurrentLocation()">
+                📍 현재 위치 가져오기
+            </button>
+            <button id="sendLocationBtn" onclick="sendLocationToServer()" disabled>
+                🚀 서버로 전송
+            </button>
+        </div>
+
+        <div id="statusMessage"></div>
+        <div id="locationDisplay"></div>
+        <div id="serverResponse"></div>
+    </div>
+
+    <script>
+        let currentLocation = null;
+
+        // 상태 메시지 표시 함수
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        // 위치 정보 표시 함수
+        function displayLocation(position) {
+            const locationDiv = document.getElementById('locationDisplay');
+            const timestamp = new Date().toLocaleString('ko-KR');
+            
+            locationDiv.innerHTML = `
+                <div class="data-display">
+                    <h3>📍 가져온 위치 정보</h3>
+                    <div class="coordinate"><span>위도:</span> ${position.coords.latitude.toFixed(6)}</div>
+                    <div class="coordinate"><span>경도:</span> ${position.coords.longitude.toFixed(6)}</div>
+                    <div class="coordinate"><span>정확도:</span> ${position.coords.accuracy.toFixed(0)}m</div>
+                    <div class="coordinate"><span>시간:</span> ${timestamp}</div>
+                </div>
+            `;
+        }
+
+        // 현재 위치 가져오기
+        function getCurrentLocation() {
+            // Geolocation API 지원 확인
+            if (!navigator.geolocation) {
+                showStatus('❌ 이 브라우저는 Geolocation을 지원하지 않습니다.', 'error');
+                return;
+            }
+
+            const getLocationBtn = document.getElementById('getLocationBtn');
+            const sendLocationBtn = document.getElementById('sendLocationBtn');
+            
+            // 버튼 상태 변경
+            getLocationBtn.disabled = true;
+            getLocationBtn.textContent = '위치 정보 가져오는 중...';
+            
+            showStatus('🔍 위치 정보를 가져오고 있습니다...', 'loading');
+
+            // Geolocation 옵션 설정
+            const options = {
+                enableHighAccuracy: true,  // 높은 정확도 요청
+                timeout: 10000,           // 10초 타임아웃
+                maximumAge: 60000         // 1분간 캐시된 위치 사용 가능
+            };
+
+            // getCurrentPosition 호출
+            navigator.geolocation.getCurrentPosition(
+                // 성공 콜백
+                function(position) {
+                    currentLocation = {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude,
+                        accuracy: position.coords.accuracy,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    displayLocation(position);
+                    showStatus('✅ 위치 정보를 성공적으로 가져왔습니다!', 'success');
+                    
+                    // 버튼 상태 복원
+                    getLocationBtn.disabled = false;
+                    getLocationBtn.textContent = '📍 현재 위치 가져오기';
+                    sendLocationBtn.disabled = false;
+                },
+                // 오류 콜백
+                function(error) {
+                    let errorMessage = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = '❌ 위치 접근이 거부되었습니다. 브라우저 설정을 확인해주세요.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = '❌ 위치 정보를 사용할 수 없습니다.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = '❌ 위치 정보 요청 시간이 초과되었습니다.';
+                            break;
+                        default:
+                            errorMessage = '❌ 알 수 없는 오류가 발생했습니다.';
+                            break;
+                    }
+                    
+                    showStatus(errorMessage, 'error');
+                    
+                    // 버튼 상태 복원
+                    getLocationBtn.disabled = false;
+                    getLocationBtn.textContent = '📍 현재 위치 가져오기';
+                },
+                options
+            );
+        }
+
+        // 서버로 위치 정보 전송
+        async function sendLocationToServer() {
+            if (!currentLocation) {
+                showStatus('❌ 먼저 위치 정보를 가져와주세요.', 'error');
+                return;
+            }
+
+            const sendLocationBtn = document.getElementById('sendLocationBtn');
+            sendLocationBtn.disabled = true;
+            sendLocationBtn.textContent = '전송 중...';
+            
+            showStatus('🚀 서버로 위치 정보를 전송하고 있습니다...', 'loading');
+
+            try {
+                // FastAPI 백엔드로 POST 요청
+                const response = await fetch('/api/location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(currentLocation)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || '서버 오류가 발생했습니다.');
+                }
+
+                const result = await response.json();
+                
+                // 서버 응답 표시
+                document.getElementById('serverResponse').innerHTML = `
+                    <div class="data-display">
+                        <h3>🎉 서버 응답</h3>
+                        <div><span>상태:</span> ${result.status}</div>
+                        <div><span>메시지:</span> ${result.message}</div>
+                        <div><span>처리된 위치:</span> ${result.location_info}</div>
+                    </div>
+                `;
+
+                showStatus('✅ 위치 정보가 성공적으로 전송되었습니다!', 'success');
+
+            } catch (error) {
+                showStatus(`❌ 전송 실패: ${error.message}`, 'error');
+                console.error('전송 오류:', error);
+            } finally {
+                // 버튼 상태 복원
+                sendLocationBtn.disabled = false;
+                sendLocationBtn.textContent = '🚀 서버로 전송';
+            }
+        }
+
+        // 페이지 로드 시 API 상태 확인
+        window.addEventListener('load', async function() {
+            try {
+                const response = await fetch('/api/health');
+                const result = await response.json();
+                console.log('API 상태:', result.message);
+            } catch (error) {
+                console.error('API 연결 확인 실패:', error);
+            }
+        });
+    </script>
+</body>
+</html>

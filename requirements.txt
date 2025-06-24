@@ -57,3 +57,5 @@ markdown>=3.5.0
 # 🔧 유틸리티
 python-multipart>=0.0.6
 aiofiles>=23.2.1
+
+pydantic==2.5.0
