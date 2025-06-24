@@ -69,3 +69,6 @@
   - Add: 신고페이지 화면 추가
   - Add: rag 기능을 사용하는 llm api생성
   - Remove: 필요없어진 gitkeep제거
+
+- 전호연
+  - Add: FR-007 Azure Custom Vision으로 이미지 트레이닝 후 개체 감지 테스트
