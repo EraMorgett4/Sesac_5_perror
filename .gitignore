@@ -2,3 +2,4 @@
 node_modules/
 __pycache__/
 sinkhole_app.db
+data/processed
