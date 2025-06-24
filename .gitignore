@@ -83,3 +83,4 @@ yarn-error.log*
 node_modules/
 __pycache__/
 sinkhole_app.db
+sample_sinkhole/
