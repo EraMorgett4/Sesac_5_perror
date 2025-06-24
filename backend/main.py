@@ -1,5 +1,5 @@
 # main.py
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status , File, Form, UploadFile
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -10,8 +10,11 @@ import random
 import math
 import requests
 import os
+# import base64
+# import io
+# from PIL import Image
 from dotenv import load_dotenv
-
+from chatbot_routes import chatbot_router
 
 from database import SessionLocal, engine, Base
 from models import User, Location, RiskPrediction
@@ -37,7 +40,7 @@ app.add_middleware(
 )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+app.include_router(chatbot_router)
 # 데이터베이스 의존성
 def get_db():
     db = SessionLocal()

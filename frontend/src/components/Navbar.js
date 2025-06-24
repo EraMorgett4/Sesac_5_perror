@@ -1,3 +1,4 @@
+// Navbar.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,6 +24,7 @@ const Navbar = () => {
           <Link to="/dashboard" className="nav-link">대시보드</Link>
           <Link to="/map" className="nav-link">위험지도</Link>
           <Link to="/route" className="nav-link">안전경로</Link>
+          <Link to="/report" className="nav-link report-link">🚨 신고하기</Link>
           
           {user ? (
             // 로그인된 상태
