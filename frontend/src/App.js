@@ -1,3 +1,4 @@
+// App.js
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
@@ -12,6 +13,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import RiskMap from './pages/RiskMap';
 import RouteSearch from './pages/RouteSearch';
+import ReportChatbot from './pages/ReportChatbot'; // 새로 추가
 import './styles/App.css';
 
 function App() {
@@ -27,6 +29,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/map" element={<RiskMap />} />
               <Route path="/route" element={<RouteSearch />} />
+              <Route path="/report" element={<ReportChatbot />} /> {/* 신고 페이지 추가 */}
               <Route path="/" element={<Navigate to="/dashboard" />} />
             </Routes>
           </main>
