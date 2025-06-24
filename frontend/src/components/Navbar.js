@@ -25,6 +25,8 @@ const Navbar = () => {
           <Link to="/map" className="nav-link">위험지도</Link>
           <Link to="/route" className="nav-link">안전경로</Link>
           <Link to="/report" className="nav-link report-link">🚨 신고하기</Link>
+
+         
           
           {user ? (
             // 로그인된 상태
