@@ -55,11 +55,20 @@
 ### 06/23
 
 - 오병주
-  - Remove gitkeep 제거
-  - Add 싱크홀 신고정보 가진 rag llm rag에 없는 정보는 일반 llm에 질문
-  - Docs rag 문서 생성
+  - Remove: gitkeep 제거
+  - Add: 싱크홀 신고정보 가진 rag llm rag에 없는 정보는 일반 llm에 질문
+  - Docs: rag 문서 생성
+- 전호연
+  - Add: OpenAI와 TTS 연동 기능 추가
 
-  ### 06/24
+### 06/24
+
+- 오병주
+  - Chore: requirements.txt 업데이트 openai사용에 필요한 라이브러리 추가
+  - Style: 신고페이지용 css 추가
+  - Add: 신고페이지 화면 추가
+  - Add: rag 기능을 사용하는 llm api생성
+  - Remove: 필요없어진 gitkeep제거
 
 - 전호연
   - Add: FR-007 Azure Custom Vision으로 이미지 트레이닝 후 개체 감지 테스트
