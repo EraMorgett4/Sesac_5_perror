@@ -69,6 +69,9 @@
   - Add: 신고페이지 화면 추가
   - Add: rag 기능을 사용하는 llm api생성
   - Remove: 필요없어진 gitkeep제거
+  - Refactor: 스피치 서비스 api 생성 목소리 텍스트로 바꿔서 llm에 질문 결과를 읽어준다
+  - Add: 화면에 플로팅버튼 생성해서 목소리 입력받게 해준다
+  - Chore: requirements.txt 스피치 서비스용 라이브러리 업데이트
 
 - 전호연
   - Add: FR-007 Azure Custom Vision으로 이미지 트레이닝 후 개체 감지 테스트
