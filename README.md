@@ -23,23 +23,25 @@
 
 ### 📑 Wiki Navigation
 
-- **[DB 설계](DB-설계)** - 데이터베이스 구조 및 ERD
-- **[기능 구현](기능-구현)** - 주요 기능별 구현 상세
-- **[기획](기획)** - 프로젝트 기획 및 요구사항 분석
-- **[디자인 및 기능](디자인-및-기능)** - UI/UX 디자인 및 기능 명세
-- **[업무 분담](업무-분담)** - 팀원별 역할 및 책임
-- **[백로그](백로그)** - 스프린트 계획 및 작업 현황
-- **[컨벤션](컨벤션)** - 코딩 컨벤션 및 협업 규칙
-- **[트러블 슈팅](트러블-슈팅)** - 개발 중 발생한 문제 및 해결책
-- **[회의록](회의록)** - 팀 회의 내용 및 결정사항
+- **[기획](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%EA%B8%B0%ED%9A%8D)** - 프로젝트 기획 및 요구사항 분석
+- **[DB 설계](https://github.com/EraMorgett4/Sesac_5_perror/wiki/DB-%EC%84%A4%EA%B3%84)** - 데이터베이스 구조 및 ERD
+- **[UI 디자인](https://github.com/EraMorgett4/Sesac_5_perror/wiki/UI-%EB%94%94%EC%9E%90%EC%9D%B8)** - UI/UX 디자인 및 기능 명세
+- **[기능 구현](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%EA%B8%B0%EB%8A%A5-%EA%B5%AC%ED%98%84)** - 주요 기능별 구현 상세
+- **[컨벤션](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%EC%BB%A8%EB%B2%A4%EC%85%98(Convention))** - 코딩 컨벤션 및 협업 규칙
+- **[백로그](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%EB%B0%B1%EB%A1%9C%EA%B7%B8)** - 스프린트 계획 및 작업 현황
+- **[업무 분담](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%EC%97%85%EB%AC%B4-%EB%B6%84%EB%8B%B4)** - 팀원별 역할 및 책임
+- **[회의록](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%ED%9A%8C%EC%9D%98%EB%A1%9D)** - 팀 회의 내용 및 결정사항
+- **[트러블 슈팅](https://github.com/EraMorgett4/Sesac_5_perror/wiki/%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85(Troubleshooting))** - 개발 중 발생한 문제 및 해결책
+
 <br/>
 
 ***
 
+
 ## 1️⃣ 프로젝트 개요
 
 <p align="center">
-  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=F781D8&width=435&lines=Insert Image or Logo;" alt="Typing SVG" />
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=24&pause=1000&color=F781D8&width=435&lines=Insert Image or Logo;" alt="Typing SVG"/>
 </p>
 
 산책부터 달리기까지, 오늘도 사람은 도로 위를 걷습니다. **하지만 이 도로는 안전할까요?**
