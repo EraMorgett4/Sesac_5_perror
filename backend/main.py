@@ -1,5 +1,4 @@
-# backend/main.py - 정리된 FastAPI 메인 애플리케이션
-
+# main.py
 from fastapi import FastAPI, Depends, HTTPException, status, File, Form, UploadFile
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +10,19 @@ import random
 import math
 import requests
 import os
+
+# # RISK_ZONES 데이터 로딩
+import sys
+from pathlib import Path
+
+# 프로젝트 루트를 Python 경로에 추가
+# project_root = Path(__file__).parent.parent
+# sys.path.insert(0, str(project_root))
+
+# from data.risk_zones.risk_zones import load_risk_zones
+
+# RISK_ZONES = load_risk_zones()
+
 import base64
 import aiohttp
 import tempfile
@@ -32,11 +44,23 @@ from chatbot_routes import chatbot_router
 from database import SessionLocal, engine, Base
 from models import User, Location, RiskPrediction
 from schemas import (
-    UserCreate, UserResponse, LocationRequest, RiskResponse, 
-    RouteRequest, RouteResponse, RouteStep, RouteWaypoint,
+    (
+    UserCreate,
+    UserResponse,
+    LocationRequest,
+    RiskResponse, 
+   
+    RouteRequest,
+    RouteResponse, RouteStep, RouteWaypoint,
     GeocodeResponse
+),
 )
-from auth import get_password_hash, verify_password, create_access_token, get_current_user
+from auth import (
+    get_password_hash,
+    verify_password,
+    create_access_token,
+    get_current_user,
+)
 from speech_service import speech_service
 
 # 환경변수 로드
@@ -104,6 +128,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 # 라우터 포함
 app.include_router(chatbot_router)
 
+
+
 # 데이터베이스 의존성
 def get_db():
     db = SessionLocal()
@@ -155,8 +181,9 @@ class STTWithProcessingResponse(BaseModel):
 # 상수 정의
 # =============================================================================
 
+
 # 서울시 더미 위험지역 데이터
-DUMMY_RISK_ZONES = [
+RISK_ZONES = [
     {"lat": 37.5665, "lng": 126.9780, "risk": 0.85, "name": "중구 명동"},
     {"lat": 37.5663, "lng": 126.9779, "risk": 0.90, "name": "중구 명동 인근"},
     {"lat": 37.5519, "lng": 126.9918, "risk": 0.78, "name": "강남구 논현동"},
@@ -1193,33 +1220,34 @@ async def shutdown_event():
 # 인증 관련 API 엔드포인트
 # =============================================================================
 
+
 @app.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     """사용자 회원가입"""
     db_user = db.query(User).filter(User.email == user.email).first()
     if db_user:
-        raise HTTPException(status_code=400, detail="이미 등록된 이메일입니다.")
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
     
+    # 새 사용자 생성
     hashed_password = get_password_hash(user.password)
     db_user = User(
-        username=user.username,
         email=user.email,
-        password=hashed_password
+        name=user.name,
+        hashed_password=hashed_password
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     
-    return UserResponse(
-        id=db_user.id,
-        username=db_user.username,
-        email=db_user.email,
-        created_at=db_user.created_at.isoformat()
-    )
+    return UserResponse(id=db_user.id, email=db_user.email, name=db_user.name)
+
 
 @app.post("/token")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    """로그인 토큰 발급"""
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """로그인"""
     user = db.query(User).filter(User.email == form_data.username).first()
     if not user or not verify_password(form_data.password, user.password):
         raise HTTPException(
@@ -1228,42 +1256,34 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    access_token_expires = timedelta(minutes=30)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    
+    access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/users/me", response_model=UserResponse)
-def read_users_me(current_user: User = Depends(get_current_user)):
-    """현재 사용자 정보 조회"""
-    return UserResponse(
-        id=current_user.id,
-        username=current_user.username,
-        email=current_user.email,
-        created_at=current_user.created_at.isoformat()
-    )
-
-# =============================================================================
-# 위험도 예측 API 엔드포인트
-# =============================================================================
+@app.get("/me", response_model=UserResponse)
+async def read_users_me(current_user: User = Depends(get_current_user)):
+    """현재 사용자 정보"""
+    return UserResponse(id=current_user.id, email=current_user.email, name=current_user.name)
 
 @app.post("/predict-risk", response_model=RiskResponse)
-async def predict_risk(location: LocationRequest):
-    """특정 위치의 싱크홀 위험도 예측"""
+async def predict_sinkhole_risk(
+    location: LocationRequest, 
+    db: Session = Depends(get_db)
+):
+    """지정 위치의 싱크홀 위험도 예측 (로그인 불필요)"""
     
-    # 가장 가까운 위험지역 찾기
+    # 주변 위험지역과의 거리 기반으로 위험도 계산
     min_distance = float('inf')
     nearest_risk = 0.0
-    
-    for zone in DUMMY_RISK_ZONES:
-        distance = calculate_distance(location.latitude, location.longitude, zone["lat"], zone["lng"])
+
+    for zone in RISK_ZONES:
+        distance = calculate_distance(
+            location.latitude, location.longitude, zone["lat"], zone["lng"]
+        )
         if distance < min_distance:
             min_distance = distance
             nearest_risk = zone["risk"]
     
-    # 거리에 따른 위험도 조정
+    # 거리에 따른 위험도 조정 (가까울수록 높은 위험도)
     if min_distance < 0.5:  # 500m 이내
         risk_score = max(0.7, nearest_risk)
     elif min_distance < 1.0:  # 1km 이내
@@ -1273,210 +1293,121 @@ async def predict_risk(location: LocationRequest):
     else:
         risk_score = min(0.3, random.uniform(0.1, 0.3))
     
+    # 예측 결과는 DB에 저장하지 않음 (로그인 불필요하므로)
+    
     return RiskResponse(
         latitude=location.latitude,
         longitude=location.longitude,
         risk_score=round(risk_score, 3),
         risk_level=get_risk_level(risk_score),
-        message=get_risk_message(risk_score)
+        message=get_risk_message(risk_score),
     )
+
 
 @app.get("/risk-zones")
 async def get_risk_zones():
-    """서울시 위험지역 목록 반환"""
+    """서울시 위험지역 목록 반환 (로그인 불필요)"""
     return {
         "zones": DUMMY_RISK_ZONES,
         "total_count": len(DUMMY_RISK_ZONES)
     }
 
-@app.get("/construction-zones")
-async def get_construction_zones():
-    """서울시 공사지역 목록 반환 (수정된 버전)"""
-    try:
-        logger.info("🏗️ 공사지역 API 호출")
-        
-        # 데이터가 없으면 로드 시도
-        if not CONSTRUCTION_DATA:
-            logger.warning("⚠️ CONSTRUCTION_DATA가 비어있음. 재로드 시도...")
-            load_construction_data()
-        
-        total_count = len(CONSTRUCTION_DATA)
-        logger.info(f"📊 현재 데이터 개수: {total_count}")
-        
-        if total_count == 0:
-            logger.error("❌ 공사장 데이터가 여전히 비어있음")
-            return {
-                "zones": [],
-                "total_count": 0,
-                "active_count": 0,
-                "error": "공사장 데이터를 로드할 수 없습니다. 서버 로그를 확인하세요."
-            }
-        
-        # 상태별 개수 계산
-        active_zones = [zone for zone in CONSTRUCTION_DATA if zone.get("status") == "진행중"]
-        completed_zones = [zone for zone in CONSTRUCTION_DATA if zone.get("status") == "완료"] 
-        planned_zones = [zone for zone in CONSTRUCTION_DATA if zone.get("status") == "예정"]
-        
-        logger.info(f"📊 상태별 개수: 진행중 {len(active_zones)}, 완료 {len(completed_zones)}, 예정 {len(planned_zones)}")
-        
-        return {
-            "zones": CONSTRUCTION_DATA,
-            "total_count": total_count,
-            "active_count": len(active_zones),
-            "completed_count": len(completed_zones),
-            "planned_count": len(planned_zones),
-            "status_breakdown": {
-                "진행중": len(active_zones),
-                "완료": len(completed_zones), 
-                "예정": len(planned_zones)
-            }
-        }
-        
-    except Exception as e:
-        logger.error(f"❌ 공사지역 API 오류: {e}")
-        logger.error(f"📄 오류 상세: {traceback.format_exc()}")
-        return {
-            "zones": [],
-            "total_count": 0,
-            "active_count": 0,
-            "error": f"API 처리 오류: {str(e)}"
-        }
-
-# =============================================================================
-# 도보 경로 안내 API 엔드포인트
-# =============================================================================
-
-@app.post("/walking-route", response_model=RouteResponse)
-async def get_walking_route(route_request: RouteRequest):
-    """실제 도보 경로 생성 API"""
-    try:
-        result = await walking_service.get_walking_route(
-            route_request.start_latitude,
-            route_request.start_longitude,
-            route_request.end_latitude,
-            route_request.end_longitude
-        )
-        
-        if not result['success']:
-            raise HTTPException(status_code=400, detail=result.get('error', '경로를 찾을 수 없습니다.'))
-        
-        return RouteResponse(
-            waypoints=[{"lat": wp[0], "lng": wp[1]} for wp in result['waypoints']],
-            distance=result['distance'] / 1000,  # km로 변환
-            estimated_time=int(result['duration'] / 60),  # 분으로 변환
-            route_type="walking",
-            avoided_zones=[],
-            steps=result.get('steps', []),
-            message="도보 경로가 생성되었습니다."
-        )
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"경로 생성 오류: {str(e)}")
-
-@app.post("/safe-walking-route", response_model=RouteResponse)
-async def get_safe_walking_route(route_request: RouteRequest):
-    """위험지역 및 공사장을 우회하는 안전한 도보 경로 생성"""
-    try:
-        # 위험지역 목록 가져오기 (싱크홀 + 공사장)
-        avoid_zones = []
-        all_risk_zones = DUMMY_RISK_ZONES + [
-            zone for zone in CONSTRUCTION_DATA if zone.get("status") == "진행중"
+@app.post("/safe-route", response_model=RouteResponse)
+async def get_safe_route(route_request: RouteRequest):
+    """위험지역을 우회하는 안전 경로 생성 (로그인 불필요)"""
+    
+    start_lat, start_lng = route_request.start_latitude, route_request.start_longitude
+    end_lat, end_lng = route_request.end_latitude, route_request.end_longitude
+    
+    # 직선 경로상의 위험지역 확인
+    dangerous_zones = []
+    for zone in DUMMY_RISK_ZONES:
+        if is_point_near_line(start_lat, start_lng, end_lat, end_lng, zone["lat"], zone["lng"], 0.5):
+            if zone["risk"] > 0.7:
+                dangerous_zones.append(zone)
+    
+    # 안전 경로 생성 (위험지역 우회)
+    if dangerous_zones:
+        # 우회 경로 생성 (시뮬레이션)
+        waypoints = generate_safe_waypoints(start_lat, start_lng, end_lat, end_lng, dangerous_zones)
+        route_type = "safe_detour"
+        message = f"{len(dangerous_zones)}개의 위험지역을 우회하는 경로입니다."
+    else:
+        # 직선 경로
+        waypoints = [
+            {"lat": start_lat, "lng": start_lng},
+            {"lat": end_lat, "lng": end_lng}
         ]
-
-        for zone in all_risk_zones:
-            # 경로 주변 2km 내의 고위험 지역만 체크
-            start_distance = calculate_distance(
-                route_request.start_latitude, route_request.start_longitude,
-                zone["lat"], zone["lng"]
-            )
-            end_distance = calculate_distance(
-                route_request.end_latitude, route_request.end_longitude,
-                zone["lat"], zone["lng"]
-            )
-            
-            # 위험도 0.7 이상인 싱크홀 지역 또는 진행중인 공사장
-            if (start_distance <= 2.0 or end_distance <= 2.0) and zone.get("risk", 0) > 0.6:
-                avoid_zones.append(zone)
-        
-        result = await walking_service.get_safe_walking_route(
-            route_request.start_latitude,
-            route_request.start_longitude,
-            route_request.end_latitude,
-            route_request.end_longitude,
-            avoid_zones # 수정된 avoid_zones 전달
-        )
-        
-        if not result['success']:
-            raise HTTPException(status_code=400, detail=result.get('error', '경로를 찾을 수 없습니다.'))
-        
-        # 메시지 개선
-        message = result.get('message', '안전한 도보 경로가 생성되었습니다.')
-        avoided_constructions = len([z for z in result.get('avoided_zones', []) if 'CONST' in z.get('id', '')])
-        if avoided_constructions > 0:
-            message += f" {avoided_constructions}개의 공사장을 우회합니다."
-
-        return RouteResponse(
-            waypoints=[{"lat": wp[0], "lng": wp[1]} for wp in result['waypoints']],
-            distance=result['distance'] / 1000,  # km로 변환
-            estimated_time=int(result['duration'] / 60),  # 분으로 변환
-            route_type=result.get('route_type', 'walking'),
-            avoided_zones=result.get('avoided_zones', []),
-            steps=result.get('steps', []),
-            message=message # 개선된 메시지
-        )
-        
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"안전 경로 생성 오류: {str(e)}")
-
-# =============================================================================
-# 지오코딩 및 검색 API 엔드포인트 (통합)
-# =============================================================================
-
-@app.get("/geocode")
-async def geocode_address(address: str):
-    """주소를 좌표로 변환"""
-    if not address:
-        raise HTTPException(status_code=400, detail="주소를 입력해주세요.")
+        route_type = "direct"
+        message = "위험지역이 없어 직선 경로를 제공합니다."
     
-    result = await walking_service.geocode_address(address)
-    
-    if not result:
-        raise HTTPException(status_code=404, detail="주소를 찾을 수 없습니다.")
-    
-    return {
-        "address": address,
-        "latitude": result['latitude'],
-        "longitude": result['longitude'],
-        "display_name": result['display_name']
-    }
+    return RouteResponse(
+        waypoints=waypoints,
+        distance=calculate_distance(start_lat, start_lng, end_lat, end_lng),
+        estimated_time=estimate_travel_time(waypoints),
+        route_type=route_type,
+        avoided_zones=dangerous_zones,
+        message=message
+    )
+
+# 유틸리티 함수들
 
 @app.get("/search-location")
 async def search_location(query: str):
-    """카카오맵 API를 사용한 지명 검색"""
+    """카카오맵 API를 사용한 지명 검색 - 400 오류 해결"""
     
     if not query or len(query) < 2:
         return {"places": []}
     
+    # API 키 확인
     if not KAKAO_API_KEY or KAKAO_API_KEY == "YOUR_KAKAO_REST_API_KEY":
         return {"places": [], "error": "카카오 API 키가 설정되지 않았습니다."}
-    
+
     try:
         url = "https://dapi.kakao.com/v2/local/search/keyword.json"
-        headers = {"Authorization": f"KakaoAK {KAKAO_API_KEY}"}
-        
-        params = {
-            "query": query.strip(),
-            "size": 5,
-            "page": 1,
-            "sort": "accuracy"
+        headers = {
+            "Authorization": f"KakaoAK {KAKAO_API_KEY}"
+            # Content-Type 제거 (GET 요청에는 불필요)
         }
         
-        response = requests.get(url, headers=headers, params=params, timeout=10)
-        response.raise_for_status()
+        # 파라미터 수정 - 문제가 되는 빈 값들 제거
+        params = {
+            "query": query.strip(),  # 앞뒤 공백 제거
+            "size": 5,               # 10 → 5로 변경
+            "page": 1,               # 페이지 명시
+            "sort": "accuracy"       # 정렬 기준 명시
+            # category_group_code 제거 (빈 값이 400 오류 원인)
+        }
         
+        # 서울 지역으로 검색 범위 제한 (선택사항)
+        # params["rect"] = "126.734086,37.413294,127.269311,37.715133"  # 서울시 경계
+        
+        print(f"카카오 API 호출: {url}")
+        print(f"파라미터: {params}")
+        
+        response = requests.get(url, headers=headers, params=params, timeout=10)
+        
+        # 상세 오류 정보 출력
+        if response.status_code != 200:
+            print(f"카카오 API 응답 코드: {response.status_code}")
+            print(f"응답 내용: {response.text}")
+            
+            # 400 오류 시 상세 정보 출력
+            if response.status_code == 400:
+                try:
+                    error_data = response.json()
+                    print(f"오류 상세: {error_data}")
+                except:
+                    pass
+                    
+        response.raise_for_status()
+
         data = response.json()
         places = data.get("documents", [])
         
+        print(f"검색 결과: {len(places)}개 찾음")
+        
+        # 응답 데이터 포맷팅
         formatted_places = []
         for place in places:
             formatted_place = {
@@ -1487,15 +1418,12 @@ async def search_location(query: str):
                 "y": place.get("y", ""),  # 위도
                 "category_name": place.get("category_name", ""),
                 "phone": place.get("phone", ""),
-                "place_url": place.get("place_url", "")
+                "place_url": place.get("place_url", ""),
             }
             formatted_places.append(formatted_place)
-        
-        return {
-            "places": formatted_places,
-            "total_count": len(formatted_places)
-        }
-        
+
+        return {"places": formatted_places, "total_count": len(formatted_places)}
+
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 400:
             return {"places": [], "error": "잘못된 요청입니다."}
@@ -1507,10 +1435,10 @@ async def search_location(query: str):
             return {"places": [], "error": "API 호출 한도를 초과했습니다."}
         else:
             return {"places": [], "error": f"API 호출 실패: {e.response.status_code}"}
-            
+
     except requests.exceptions.Timeout:
         return {"places": [], "error": "검색 시간이 초과되었습니다."}
-        
+
     except Exception as e:
         print(f"지명 검색 오류: {e}")
         return {"places": [], "error": "검색 중 오류가 발생했습니다."}
@@ -1727,7 +1655,7 @@ async def stt_debug_endpoint(audio: UploadFile = File(...)):
             "debug_info": debug_info,
             "recommendations": generate_stt_recommendations(debug_info)
         }
-        
+
     except Exception as e:
         logger.error(f"❌ STT 디버깅 오류: {e}")
         raise HTTPException(status_code=500, detail=f"디버깅 오류: {str(e)}")
@@ -2307,6 +2235,7 @@ async def test_destination_service():
 # =============================================================================
 # 메인 실행부
 # =============================================================================
+
 
 if __name__ == "__main__":
     print("🚀 Seoul Safety Navigation API 서버 시작")

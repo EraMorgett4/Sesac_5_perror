@@ -25,7 +25,6 @@ pandas==2.3.0
 httpx==0.27.0
 azure-cognitiveservices-speech==1.44.0
 azure-cognitiveservices-vision-customvision==3.1.1
-
 # 기존 requirements에 추가
 psycopg2-binary==2.9.9
 
