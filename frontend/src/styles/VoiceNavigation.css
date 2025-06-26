@@ -1,0 +1,340 @@
+/* frontend/src/styles/VoiceNavigation.css */
+
+/* 기본 음성 네비게이션 스타일 */
+.voice-navigation {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px 0;
+  color: white;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+}
+
+.voice-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.start-voice-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 50px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+  min-width: 200px;
+}
+
+.start-voice-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+}
+
+.start-voice-btn:disabled {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  cursor: not-allowed;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.navigation-status {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.nav-info {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.nav-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.nav-info p {
+  margin: 5px 0;
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.stop-nav-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.stop-nav-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.confirmation-dialog {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 15px;
+}
+
+.confirmation-dialog p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.confirmation-dialog strong {
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.location-info {
+  text-align: center;
+  margin-top: 15px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.location-info small {
+  font-size: 12px;
+  opacity: 0.8;
+  font-family: 'Courier New', monospace;
+}
+
+/* Azure 음성 안내 전용 스타일 */
+.azure-voice {
+  background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+  border: 2px solid #0078d4;
+}
+
+.azure-btn {
+  background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+  box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+}
+
+.azure-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #106ebe 0%, #005a9e 100%);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
+.azure-btn:disabled {
+  background: linear-gradient(135deg, #a19f9d 0%, #8a8886 100%);
+  animation: azurePulse 1.5s infinite;
+}
+
+@keyframes azurePulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+.azure-dialog {
+  background: rgba(0, 120, 212, 0.15);
+  border: 1px solid rgba(0, 120, 212, 0.3);
+}
+
+.azure-dialog strong {
+  color: #0078d4;
+  font-weight: 700;
+}
+
+/* 음성 품질 인디케이터 */
+.voice-quality-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.quality-badge {
+  background: #0078d4;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 10px;
+}
+
+/* 음성 처리 상태 */
+.voice-processing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.processing-spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 음성 레벨 미터 */
+.voice-level-meter {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+  margin: 10px 0;
+}
+
+.voice-level-bar {
+  width: 3px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  transition: all 0.1s ease;
+}
+
+.voice-level-bar.active {
+  background: #00ff88;
+  animation: voiceLevel 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes voiceLevel {
+  0% { height: 5px; }
+  100% { height: 20px; }
+}
+
+/* Azure 브랜딩 */
+.azure-branding {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 15px;
+  padding: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.azure-logo {
+  width: 16px;
+  height: 16px;
+  background: #0078d4;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 8px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .voice-navigation {
+    margin: 10px;
+    padding: 15px;
+  }
+  
+  .start-voice-btn {
+    font-size: 16px;
+    padding: 12px 25px;
+    min-width: 180px;
+  }
+  
+  .nav-info h3 {
+    font-size: 18px;
+  }
+  
+  .nav-info p {
+    font-size: 14px;
+  }
+}
+
+/* 접근성 개선 */
+@media (prefers-reduced-motion: reduce) {
+  .start-voice-btn:hover:not(:disabled) {
+    transform: none;
+  }
+  
+  .stop-nav-btn:hover {
+    transform: none;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  @keyframes azurePulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+}
+
+/* 고대비 모드 지원 */
+@media (prefers-contrast: high) {
+  .voice-navigation {
+    background: #000;
+    border: 2px solid #fff;
+  }
+  
+  .navigation-status {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #fff;
+  }
+  
+  .confirmation-dialog {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid #fff;
+  }
+  
+  .azure-voice {
+    background: #000080;
+    border: 3px solid #00ffff;
+  }
+  
+  .azure-btn {
+    background: #000080;
+    border: 2px solid #00ffff;
+  }
+  
+  .azure-dialog {
+    background: rgba(0, 0, 128, 0.3);
+    border: 2px solid #00ffff;
+  }
+}

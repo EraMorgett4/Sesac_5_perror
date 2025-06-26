@@ -73,6 +73,8 @@ class SpeechService:
             )
             speech_config.speech_recognition_language = "ko-KR"
             
+            speech_config.set_property(speechsdk.PropertyId.SpeechServiceConnection_EndSilenceTimeoutMs, "8000")  # 8초까지 대기
+
             # 바이트 데이터를 스트림으로 변환
             audio_stream = speechsdk.audio.PushAudioInputStream()
             audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)

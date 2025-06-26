@@ -20,7 +20,7 @@ const VoiceAssistantWidget = () => {
   // 컴포넌트 마운트 시 음성 인식 초기화
   useEffect(() => {
     initSpeechRecognition();
-    initMediaRecorder();
+    //initMediaRecorder();
     
     // 컴포넌트 언마운트 시 정리
     return () => {
@@ -28,41 +28,41 @@ const VoiceAssistantWidget = () => {
         recognitionRef.current.abort();
       }
       speechSynthesisRef.current.cancel();
-      if (mediaRecorder) {
-        mediaRecorder.stop();
-      }
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
     };
   }, []);
 
   // MediaRecorder 초기화 (백엔드 STT용)
-  const initMediaRecorder = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
+  // const initMediaRecorder = async () => {
+  //   try {
+  //     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  //     const recorder = new MediaRecorder(stream);
       
-      recorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
+  //     recorder.ondataavailable = (event) => {
+  //       if (event.data.size > 0) {
+  //         audioChunksRef.current.push(event.data);
+  //       }
+  //     };
       
-      recorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-        setRecordedAudio(audioBlob);
-        audioChunksRef.current = [];
+  //     recorder.onstop = () => {
+  //       const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+  //       setRecordedAudio(audioBlob);
+  //       audioChunksRef.current = [];
         
-        // 백엔드 STT 사용 시 자동으로 처리
-        if (useBackendSTT) {
-          processBackendSTT(audioBlob);
-        }
-      };
+  //       // 백엔드 STT 사용 시 자동으로 처리
+  //       if (useBackendSTT) {
+  //         processBackendSTT(audioBlob);
+  //       }
+  //     };
       
-      setMediaRecorder(recorder);
-      console.log('✅ MediaRecorder 초기화 완료');
-    } catch (error) {
-      console.error('❌ MediaRecorder 초기화 실패:', error);
-    }
-  };
+  //     setMediaRecorder(recorder);
+  //     console.log('✅ MediaRecorder 초기화 완료');
+  //   } catch (error) {
+  //     console.error('❌ MediaRecorder 초기화 실패:', error);
+  //   }
+  // };
 
   // 음성 인식 초기화
   const initSpeechRecognition = () => {
@@ -228,24 +228,18 @@ const VoiceAssistantWidget = () => {
     showVoiceOverlay();
     setIsRecording(true);
 
-    if (useBackendSTT && mediaRecorder) {
+    if (useBackendSTT ) {
       // 백엔드 STT 사용: 오디오 녹음
-      try {
-        audioChunksRef.current = [];
-        mediaRecorder.start();
-        updateStatus('recording', '🔴', '음성 녹음 중...', '완료되면 자동으로 처리됩니다');
-      } catch (error) {
-        console.error('MediaRecorder 시작 오류:', error);
-        hideOverlay();
-        resetButton();
-      }
-    } else {
-      // 브라우저 STT 사용: Web Speech API
-      if (!recognitionRef.current) {
-        hideOverlay();
-        resetButton();
-        return;
-      }
+
+      startBackendRecording();
+  } else {
+    // 브라우저 STT 사용: Web Speech API (권한 요청 없음)
+    if (!recognitionRef.current) {
+      hideOverlay();
+      resetButton();
+      return;
+    }
+      
 
       try {
         recognitionRef.current.start();
@@ -256,6 +250,66 @@ const VoiceAssistantWidget = () => {
       }
     }
   };
+
+
+const startBackendRecording = async () => {
+  try {
+    // 🔧 여기서 마이크 권한 요청 (사용할 때만)
+    const stream = await navigator.mediaDevices.getUserMedia({ 
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
+    });
+    
+    // 🔧 매번 새로운 MediaRecorder 생성
+    const recorder = new MediaRecorder(stream, {
+      mimeType: MediaRecorder.isTypeSupported('audio/wav') ? 'audio/wav' : 'audio/webm'
+    });
+    
+    audioChunksRef.current = [];
+    
+    recorder.ondataavailable = (event) => {
+      if (event.data.size > 0) {
+        audioChunksRef.current.push(event.data);
+      }
+    };
+    
+    recorder.onstop = () => {
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
+      setRecordedAudio(audioBlob);
+      audioChunksRef.current = [];
+      
+      // 🔧 스트림 정리 (권한 해제)
+      stream.getTracks().forEach(track => track.stop());
+      
+      // 백엔드 STT 처리
+      processBackendSTT(audioBlob);
+    };
+    
+    // 🔧 현재 MediaRecorder 참조 저장
+    setMediaRecorder(recorder);
+    
+    recorder.start();
+    updateStatus('recording', '🔴', '음성 녹음 중...', '완료되면 자동으로 처리됩니다');
+    
+  } catch (error) {
+    console.error('마이크 권한 요청 실패:', error);
+    hideOverlay();
+    resetButton();
+    
+    // 🔧 구체적인 에러 메시지
+    if (error.name === 'NotAllowedError') {
+      alert('마이크 권한이 필요합니다. 브라우저에서 마이크 접근을 허용해주세요.');
+    } else if (error.name === 'NotFoundError') {
+      alert('마이크를 찾을 수 없습니다. 마이크가 연결되어 있는지 확인해주세요.');
+    } else {
+      alert('마이크 접근 중 오류가 발생했습니다.');
+    }
+  }
+};
+
 
   // 음성 재생 중지
   const stopSpeaking = () => {
@@ -279,20 +333,24 @@ const VoiceAssistantWidget = () => {
     hideOverlay();
     resetButton();
   };
-
-  // 녹음 중지
-  const stopRecording = () => {
-    console.log('⏹️ 녹음 중지');
-    if (useBackendSTT && mediaRecorder && mediaRecorder.state === 'recording') {
-      mediaRecorder.stop();
-    }
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-    setIsRecording(false);
-    hideOverlay();
-    resetButton();
-  };
+// 🔧 수정 5: stopRecording 함수 수정
+const stopRecording = () => {
+  console.log('⏹️ 녹음 중지');
+  
+  if (useBackendSTT && mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    // 🔧 MediaRecorder 참조 정리
+    setMediaRecorder(null);
+  }
+  
+  if (recognitionRef.current) {
+    recognitionRef.current.stop();
+  }
+  
+  setIsRecording(false);
+  hideOverlay();
+  resetButton();
+};
 
   // 음성 쿼리 처리 (백엔드 TTS 사용 옵션)
   const processVoiceQuery = async (query) => {
