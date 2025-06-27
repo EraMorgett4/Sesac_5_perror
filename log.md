@@ -100,3 +100,12 @@
 - 전호연
   - Add : 기능 추가 (FR-010)
 
+### 06/27
+- 오병주
+  - Docs: 공사구간 정보 데이터 추가
+  - Chore: postgresql 마이그레이션 준비
+  - Chore: requirements.txt 필요한 라이브러리 추가
+  - Add: 네비게이션 목소리를 통해서 길찾고 경로안내기능 추가
+  - Refactor: 네비게이션기능 추가
+  - Style: 디자인 통일성
+  - Add: 산책로 추천기능 추가
