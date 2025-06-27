@@ -27,6 +27,7 @@ import pandas as pd
 import csv
 import shutil
 from pathlib import Path
+from exercise_route_service import exercise_route_service
 
 # 로컬 모듈 임포트
 from chatbot_routes import chatbot_router
@@ -174,6 +175,52 @@ class STTWithProcessingResponse(BaseModel):
     recommended_search_text: str
     should_proceed: bool
     error: Optional[str] = None
+
+
+# =============================================================================
+# 만보기 경로 관련 Pydantic 모델
+# =============================================================================
+
+
+class ExerciseRouteRequest(BaseModel):
+    start_latitude: float
+    start_longitude: float
+    target_steps: Optional[int] = 10000  # 기본 만보
+    route_type: str = "circular"  # 'circular' 또는 'out_and_back'
+    area_preference: str = "auto"  # 'auto', 'park', 'river', 'current'
+    avoid_dangerous_zones: bool = True
+
+
+class ExerciseRouteResponse(BaseModel):
+    success: bool
+    route_type: str
+    waypoints: List[RouteWaypoint]
+    distance: float  # km
+    estimated_time: int  # 분
+    target_steps: int
+    actual_steps: int
+    steps_accuracy: float  # 퍼센트
+    exercise_area: Dict[str, Any]
+    route_description: str
+    avoided_zones: List[Dict[str, Any]]
+    steps: List[RouteStep]
+    message: str
+    health_benefits: Dict[str, Any]
+    difficulty: str
+    error: Optional[str] = None
+
+
+class StepsCalculatorRequest(BaseModel):
+    distance_km: float
+    user_height_cm: Optional[int] = 170  # 기본 키 170cm
+
+
+class StepsCalculatorResponse(BaseModel):
+    distance_km: float
+    estimated_steps: int
+    user_height_cm: int
+    stride_length_cm: float
+    walking_time_minutes: int
 
 
 # =============================================================================
@@ -2321,6 +2368,432 @@ async def navigation_tts(request: TTSRequest):
             voice_name=request.voice_name or "ko-KR-HyunsuMultilingualNeural",
             text=request.text,
         )
+
+
+# =============================================================================
+# 만보기 경로 API 엔드포인트
+# =============================================================================
+
+
+@app.post("/exercise-route", response_model=ExerciseRouteResponse)
+async def generate_exercise_route(route_request: ExerciseRouteRequest):
+    """만보기 운동 경로 생성 API"""
+    try:
+        start_location = {
+            "lat": route_request.start_latitude,
+            "lng": route_request.start_longitude,
+        }
+
+        # 위험지역 수집 (옵션)
+        avoid_zones = []
+        if route_request.avoid_dangerous_zones:
+            # 기존 위험지역 데이터 + 공사장 데이터 활용
+            all_zones = DUMMY_RISK_ZONES + [
+                zone
+                for zone in CONSTRUCTION_DATA
+                if zone.get("status") == "진행중" and zone.get("risk", 0) > 0.6
+            ]
+
+            # 시작점 주변 3km 내 위험지역만 선별
+            for zone in all_zones:
+                distance = calculate_distance(
+                    route_request.start_latitude,
+                    route_request.start_longitude,
+                    zone["lat"],
+                    zone["lng"],
+                )
+                if distance <= 3.0 and zone.get("risk", 0) > 0.6:
+                    avoid_zones.append(zone)
+
+        # 운동 경로 생성
+        result = await exercise_route_service.generate_exercise_route(
+            start_location=start_location,
+            target_steps=route_request.target_steps,
+            route_type=route_request.route_type,
+            area_preference=route_request.area_preference,
+            avoid_zones=avoid_zones,
+        )
+
+        if not result["success"]:
+            raise HTTPException(
+                status_code=400, detail=result.get("error", "경로 생성 실패")
+            )
+
+        return ExerciseRouteResponse(**result)
+
+    except Exception as e:
+        logger.error(f"운동 경로 생성 오류: {e}")
+        raise HTTPException(status_code=500, detail=f"서버 오류: {str(e)}")
+
+
+@app.post("/calculate-steps", response_model=StepsCalculatorResponse)
+async def calculate_steps_for_distance(request: StepsCalculatorRequest):
+    """거리에 따른 걸음 수 계산"""
+    try:
+        # 보폭 계산 (키에 따른 대략적 계산)
+        stride_length_cm = request.user_height_cm * 0.45  # 키의 45% 정도가 보폭
+        stride_length_m = stride_length_cm / 100
+
+        # 걸음 수 계산
+        distance_m = request.distance_km * 1000
+        estimated_steps = int(distance_m / stride_length_m)
+
+        # 걷기 시간 계산 (시속 4km 기준)
+        walking_time_minutes = int((request.distance_km / 4.0) * 60)
+
+        return StepsCalculatorResponse(
+            distance_km=request.distance_km,
+            estimated_steps=estimated_steps,
+            user_height_cm=request.user_height_cm,
+            stride_length_cm=stride_length_cm,
+            walking_time_minutes=walking_time_minutes,
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"계산 오류: {str(e)}")
+
+
+# main.py 파일에서 이 함수를 찾아 교체하세요.
+
+
+@app.get("/exercise-areas")
+async def get_exercise_areas():
+    """서울시 추천 운동 지역 목록 (수정된 버전)"""
+    try:
+        areas_with_info = []
+
+        # 각 타입에 대한 설명을 담은 딕셔너리
+        type_descriptions = {
+            "park": "공원",
+            "river": "강변",
+            "stream": "하천",
+            "mountain": "산/숲길",
+            "trail": "숲길/산책로",
+            "history": "역사/문화",
+        }
+
+        # 각 타입에 대한 추천 활동을 담은 딕셔너리
+        recommended_activities = {
+            "park": ["가족 산책", "조깅", "자전거"],
+            "river": ["장거리 걷기", "조깅", "자전거"],
+            "stream": ["가벼운 산책", "조깅"],
+            "mountain": ["등산", "트레킹", "자연 감상"],
+            "trail": ["테마 산책", "사진 촬영", "데이트"],
+            "history": ["역사 탐방", "고궁 산책", "문화 체험"],
+        }
+
+        # 각 타입에 대한 편의시설 정보를 담은 딕셔너리
+        facilities_info = {
+            "park": ["화장실", "음수대", "벤치"],
+            "river": ["화장실", "자전거 대여소"],
+            "stream": ["벤치", "운동기구"],
+            "mountain": ["등산로", "쉼터"],
+            "trail": ["안내판", "카페/상점"],
+            "history": ["문화해설", "주변 맛집"],
+        }
+
+        for area in exercise_route_service.safe_areas:
+            area_type = area.get(
+                "type", "park"
+            )  # 기본값을 'park'로 설정하여 안정성 확보
+
+            area_info = {
+                "name": area["name"],
+                "center": {"lat": area["center"][0], "lng": area["center"][1]},
+                "type": area_type,
+                "type_description": type_descriptions.get(area_type, "산책로"),
+                "recommended_activities": recommended_activities.get(
+                    area_type, ["산책"]
+                ),
+                "difficulty": "easy" if area_type not in ["mountain"] else "medium",
+                "facilities": facilities_info.get(area_type, ["편의시설"]),
+            }
+            areas_with_info.append(area_info)
+
+        # 타입별 개수 계산
+        type_counts = {}
+        for area in areas_with_info:
+            type_counts[area["type"]] = type_counts.get(area["type"], 0) + 1
+
+        return {
+            "areas": areas_with_info,
+            "total_count": len(areas_with_info),
+            "types": type_counts,
+        }
+
+    except Exception as e:
+        logger.error(f"지역 정보 조회 오류: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail=f"지역 정보 조회 중 오류가 발생했습니다: {str(e)}"
+        )
+
+
+@app.post("/quick-exercise-route")
+async def generate_quick_exercise_route(
+    lat: float,
+    lng: float,
+    minutes: int = 30,  # 운동 시간 (분)
+    route_type: str = "circular",
+):
+    """시간 기반 간단 운동 경로 생성"""
+    try:
+        # 시간을 거리로 변환 (시속 4km 기준)
+        target_distance = (minutes / 60) * 4.0  # km
+        target_steps = int(target_distance * exercise_route_service.steps_per_kilometer)
+
+        start_location = {"lat": lat, "lng": lng}
+
+        result = await exercise_route_service.generate_exercise_route(
+            start_location=start_location,
+            target_steps=target_steps,
+            route_type=route_type,
+            area_preference="current",  # 현재 위치 기준
+            avoid_zones=[],
+        )
+
+        if result["success"]:
+            # 간단한 응답 형태로 변환
+            return {
+                "success": True,
+                "distance_km": result["distance"],
+                "estimated_time": result["estimated_time"],
+                "estimated_steps": result["actual_steps"],
+                "waypoints": result["waypoints"],
+                "route_type": result["route_type"],
+                "message": f"{minutes}분 운동을 위한 {result['route_description']}입니다.",
+            }
+        else:
+            raise HTTPException(
+                status_code=400, detail=result.get("error", "경로 생성 실패")
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"간단 경로 생성 오류: {str(e)}")
+
+
+@app.get("/exercise-recommendations")
+async def get_exercise_recommendations(
+    user_age: int = 30,
+    fitness_level: str = "beginner",  # 'beginner', 'intermediate', 'advanced'
+    available_time: int = 30,  # 분
+):
+    """사용자 맞춤 운동 추천"""
+    try:
+        # 나이와 체력 수준에 따른 추천
+        if fitness_level == "beginner":
+            if user_age < 30:
+                recommended_steps = 8000
+                recommended_time = min(available_time, 25)
+            elif user_age < 50:
+                recommended_steps = 7000
+                recommended_time = min(available_time, 30)
+            else:
+                recommended_steps = 6000
+                recommended_time = min(available_time, 25)
+        elif fitness_level == "intermediate":
+            if user_age < 30:
+                recommended_steps = 12000
+                recommended_time = min(available_time, 40)
+            elif user_age < 50:
+                recommended_steps = 10000
+                recommended_time = min(available_time, 35)
+            else:
+                recommended_steps = 8000
+                recommended_time = min(available_time, 30)
+        else:  # advanced
+            if user_age < 30:
+                recommended_steps = 15000
+                recommended_time = min(available_time, 60)
+            elif user_age < 50:
+                recommended_steps = 13000
+                recommended_time = min(available_time, 50)
+            else:
+                recommended_steps = 10000
+                recommended_time = min(available_time, 40)
+
+        recommended_distance = (
+            recommended_steps / exercise_route_service.steps_per_kilometer
+        )
+
+        # 추천 지역 타입
+        area_recommendations = {
+            "beginner": ["park", "stream"],
+            "intermediate": ["park", "river"],
+            "advanced": ["river", "mountain"],
+        }
+
+        return {
+            "user_profile": {
+                "age": user_age,
+                "fitness_level": fitness_level,
+                "available_time": available_time,
+            },
+            "recommendations": {
+                "target_steps": recommended_steps,
+                "target_distance_km": round(recommended_distance, 2),
+                "recommended_time_minutes": recommended_time,
+                "preferred_route_type": (
+                    "circular" if fitness_level == "beginner" else "out_and_back"
+                ),
+                "preferred_areas": area_recommendations[fitness_level],
+                "intensity": {
+                    "beginner": "천천히 꾸준히",
+                    "intermediate": "적당한 속도로",
+                    "advanced": "활발하게",
+                }[fitness_level],
+            },
+            "tips": {
+                "beginner": [
+                    "처음엔 짧은 거리부터 시작하세요",
+                    "무리하지 말고 본인 페이스로",
+                    "편한 운동화를 착용하세요",
+                    "충분한 수분 섭취를 하세요",
+                ],
+                "intermediate": [
+                    "일주일에 3-4회 규칙적으로",
+                    "운동 전후 스트레칭 필수",
+                    "다양한 경로로 지루함 방지",
+                    "목표를 조금씩 늘려가세요",
+                ],
+                "advanced": [
+                    "인터벌 트레이닝 도입",
+                    "경사로나 계단 활용",
+                    "심박수 모니터링",
+                    "크로스 트레이닝 병행",
+                ],
+            }[fitness_level],
+            "safety_notes": [
+                "날씨가 나쁠 때는 실내 운동으로 대체",
+                "몸이 아프면 무리하지 말고 휴식",
+                "야간 운동 시 안전장비 착용",
+                "수분과 간단한 간식 준비",
+            ],
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"추천 생성 오류: {str(e)}")
+
+
+@app.get("/exercise-statistics")
+async def get_exercise_statistics(
+    steps: int, duration_minutes: int, user_weight_kg: int = 70
+):
+    """운동 통계 및 효과 분석"""
+    try:
+        distance_km = steps / exercise_route_service.steps_per_kilometer
+
+        # 칼로리 계산 (체중과 거리 기반)
+        # MET(Metabolic Equivalent) 값 사용: 걷기 = 3.5 METs
+        met_value = 3.5
+        calories_burned = met_value * user_weight_kg * (duration_minutes / 60)
+
+        # 운동 강도 평가
+        speed_kmh = distance_km / (duration_minutes / 60) if duration_minutes > 0 else 0
+
+        if speed_kmh < 3:
+            intensity = "낮음"
+            intensity_description = "가벼운 산책 수준"
+        elif speed_kmh < 5:
+            intensity = "보통"
+            intensity_description = "적당한 걷기 운동"
+        elif speed_kmh < 6:
+            intensity = "높음"
+            intensity_description = "빠른 걷기 운동"
+        else:
+            intensity = "매우높음"
+            intensity_description = "조깅에 가까운 운동"
+
+        # 건강 효과 평가
+        health_score = min(100, int((steps / 10000) * 100))
+
+        health_benefits = []
+        if steps >= 3000:
+            health_benefits.append("기초 대사량 증가")
+        if steps >= 5000:
+            health_benefits.append("심혈관 건강 개선")
+        if steps >= 7000:
+            health_benefits.append("체중 관리 효과")
+        if steps >= 10000:
+            health_benefits.append("스트레스 해소 및 정신건강")
+        if steps >= 12000:
+            health_benefits.append("근력 및 지구력 향상")
+
+        return {
+            "exercise_data": {
+                "steps": steps,
+                "distance_km": round(distance_km, 2),
+                "duration_minutes": duration_minutes,
+                "average_speed_kmh": round(speed_kmh, 1),
+                "user_weight_kg": user_weight_kg,
+            },
+            "calories": {
+                "burned": int(calories_burned),
+                "equivalent_foods": {
+                    "rice_bowls": round(
+                        calories_burned / 210, 1
+                    ),  # 밥 한 공기 약 210kcal
+                    "apples": round(calories_burned / 95, 1),  # 사과 1개 약 95kcal
+                    "chocolate_pieces": round(
+                        calories_burned / 25, 1
+                    ),  # 초콜릿 1조각 약 25kcal
+                },
+            },
+            "intensity": {
+                "level": intensity,
+                "description": intensity_description,
+                "recommendation": (
+                    "적절한 운동 강도입니다"
+                    if intensity in ["보통", "높음"]
+                    else (
+                        "좀 더 활발히 걸어보세요"
+                        if intensity == "낮음"
+                        else "무리하지 마세요"
+                    )
+                ),
+            },
+            "health_assessment": {
+                "score": health_score,
+                "grade": (
+                    "우수"
+                    if health_score >= 80
+                    else (
+                        "양호"
+                        if health_score >= 60
+                        else "보통" if health_score >= 40 else "부족"
+                    )
+                ),
+                "benefits": health_benefits,
+                "daily_goal_achievement": (
+                    f"{(steps / 10000 * 100):.1f}%" if steps <= 10000 else "목표 달성!"
+                ),
+            },
+            "recommendations": {
+                "next_goal": min(steps + 1000, 15000) if steps < 10000 else steps,
+                "weekly_target": steps * 5,  # 주 5회 기준
+                "improvement_tips": [
+                    "매일 조금씩 걸음 수를 늘려보세요",
+                    "계단 이용하기",
+                    "가까운 거리는 걸어서 이동",
+                    "친구나 가족과 함께 걷기",
+                ],
+            },
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"통계 분석 오류: {str(e)}")
+
+
+# =============================================================================
+# 앱 종료 시 서비스 정리
+# =============================================================================
+
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """앱 종료 시 실행"""
+    await walking_service.close_session()
+    await exercise_route_service.close_session()
+    print("🔄 모든 서비스 종료 완료")
 
 
 # =============================================================================
