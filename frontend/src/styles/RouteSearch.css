@@ -724,3 +724,151 @@
   color: #6c757d !important;
   font-size: 11px !important;
 }
+
+
+
+/* =============================================================================
+   추천 산책로 패널 스타일
+   ============================================================================= */
+
+.recommend-panel {
+  padding: 10px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.recommend-panel h3 {
+  font-size: 1.3em;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 8px;
+}
+
+.recommend-panel p {
+  font-size: 0.9em;
+  color: #7f8c8d;
+  margin-bottom: 16px;
+}
+
+.course-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.course-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-color: #3498db;
+}
+
+.course-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.course-type {
+  font-size: 0.75em;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #fff;
+}
+
+.course-type.park { background-color: #27ae60; }
+.course-type.river { background-color: #2980b9; }
+.course-type.stream { background-color: #1abc9c; }
+.course-type.mountain { background-color: #d35400; }
+.course-type.trail { background-color: #8e44ad; }
+.course-type.history { background-color: #7f8c8d; }
+
+.course-distance {
+  font-size: 0.8em;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.course-name {
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 10px 0;
+}
+
+.course-tags {
+  margin-bottom: 12px;
+}
+
+.course-tags .tag {
+  display: inline-block;
+  background-color: #ecf0f1;
+  color: #7f8c8d;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.75em;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.course-select-btn {
+  width: 100%;
+  padding: 10px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  display: none; /* 기본 숨김 */
+}
+
+.course-card:hover .course-select-btn {
+  display: block; /* 호버 시 표시 */
+}
+
+.course-select-btn:hover {
+  background: #2980b9;
+}
+
+/* 탭 UI 개선 */
+.search-tabs {
+  display: flex;
+  margin-bottom: 16px;
+  background-color: #f0f2f5;
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  color: #555;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  background-color: #ffffff;
+  color: #3498db;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
