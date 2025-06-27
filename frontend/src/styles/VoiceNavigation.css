@@ -1,0 +1,184 @@
+/* frontend/src/styles/VoiceNavigation.css - 최종 완료 버전 */
+
+.voice-navigation {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 15px 0;
+  color: #333;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.1);
+  text-align: center;
+}
+
+.voice-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+/* 시작 버튼 크기 증가 및 디자인 개선 */
+.start-voice-btn {
+  background: linear-gradient(135deg, #0078d4 0%, #106ebe 100%);
+  color: white;
+  border: none;
+  padding: 16px 35px; /* 크기 증가 */
+  border-radius: 50px;
+  font-size: 1.1em; /* 크기 증가 */
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 120, 212, 0.3);
+  min-width: 220px; /* 최소 너비 설정 */
+}
+
+.start-voice-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 120, 212, 0.4);
+}
+
+.start-voice-btn:disabled {
+  background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+  cursor: not-allowed;
+}
+
+/* 안내 활성화 시 UI */
+.navigation-status {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-info {
+  text-align: center;
+  margin-bottom: 15px;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1em;
+  font-weight: 600;
+  color: #005a9e;
+}
+
+/* 안내 종료 버튼 */
+.stop-nav-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.stop-nav-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* 음성 레벨 미터 */
+.voice-level-meter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 30px;
+  margin-top: 5px;
+}
+
+.voice-level-bar {
+  width: 5px;
+  background: #bdc3c7;
+  border-radius: 3px;
+  transition: all 0.1s ease;
+}
+
+.voice-level-bar.active {
+  background: #2ecc71;
+  animation: voiceLevel 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes voiceLevel {
+  0% { height: 5px; }
+  100% { height: 25px; }
+}
+
+/* Azure 테마 색상 (필요시) */
+.azure-voice {
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+}
+
+
+
+/* 목적지 확인 다이얼로그 스타일 */
+.confirmation-dialog {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.confirmation-dialog p {
+  margin: 0 0 15px 0;
+  font-size: 1.1em;
+  font-weight: 500;
+  color: #333;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.confirm-btn {
+  border: none;
+  border-radius: 25px;
+  padding: 12px 30px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: white;
+  min-width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.yes-btn {
+  background: linear-gradient(135deg, #2ecc71, #28b463);
+  box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.yes-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+.no-btn {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+.no-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}

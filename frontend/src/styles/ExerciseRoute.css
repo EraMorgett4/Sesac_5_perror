@@ -1,0 +1,995 @@
+
+
+.exercise-route {
+  display: flex;
+  height: 100vh;
+  background: #f5f7fa;
+}
+
+.exercise-panel {
+  width: 400px;
+  background: white;
+  border-right: 1px solid #e0e6ed;
+  overflow-y: auto;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-panel h2 {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 24px;
+  font-weight: 600;
+  text-align: center;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #3498db;
+}
+
+/* 탭 스타일 */
+.exercise-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e6ed;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: #f8f9fa;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.tab-btn.active {
+  background: #3498db;
+  color: white;
+}
+
+.tab-btn:hover:not(.active) {
+  background: #e9ecef;
+}
+
+/* 사용자 정보 섹션 */
+.user-profile-section {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.user-profile-section h3 {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.profile-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-row label {
+  min-width: 60px;
+  font-size: 13px;
+  color: #666;
+}
+
+.input-row input, .input-row select {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.input-row span {
+  font-size: 12px;
+  color: #666;
+}
+
+.recommendation-btn {
+  width: 100%;
+  padding: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.2s ease;
+}
+
+.recommendation-btn:hover {
+  transform: translateY(-1px);
+}
+
+/* 추천 섹션 */
+.recommendations-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.recommendations-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.recommendation-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.rec-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.rec-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.rec-stat .label {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.rec-stat .value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rec-tips h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.rec-tips ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rec-tips li {
+  margin-bottom: 4px;
+}
+
+/* 운동 설정 */
+.exercise-settings {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.exercise-settings h3 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #555;
+  font-size: 14px;
+}
+
+.steps-input, .time-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.steps-input input, .time-input input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.steps-input span, .time-input span {
+  font-weight: 500;
+  color: #666;
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.preset-btn {
+  padding: 6px 12px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #495057;
+  transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.route-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.radio-option:hover {
+  background: #f8f9fa;
+}
+
+.radio-option input[type="radio"] {
+  margin: 0;
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.checkbox-option:hover {
+  background: #f8f9fa;
+}
+
+.checkbox-option input[type="checkbox"] {
+  margin: 0;
+}
+
+.generate-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+}
+
+.generate-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 경로 결과 */
+.route-result {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.route-result h3 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.route-details {
+  margin-bottom: 16px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-size: 13px;
+  color: #666;
+}
+
+.detail-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.route-message {
+  background: #e3f2fd;
+  border-left: 4px solid #2196F3;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.route-message p {
+  margin: 0;
+  font-size: 14px;
+  color: #1565c0;
+}
+
+/* 건강 효과 */
+.health-benefits {
+  background: #f1f8e9;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.health-benefits h4 {
+  margin: 0 0 10px 0;
+  color: #33691e;
+  font-size: 14px;
+}
+
+.benefits-stats {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.benefit-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.benefit-label {
+  font-size: 11px;
+  color: #558b2f;
+}
+
+.benefit-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #33691e;
+}
+
+.benefits-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.benefit-tag {
+  font-size: 10px;
+  background: #c8e6c9;
+  color: #2e7d32;
+  padding: 2px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+
+/* 우회 지역 */
+.avoided-zones {
+  background: #fff3e0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.avoided-zones h4 {
+  margin: 0 0 8px 0;
+  color: #e65100;
+  font-size: 14px;
+}
+
+.avoided-zones ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.zone-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #ffe0b2;
+}
+
+.zone-item:last-child {
+  border-bottom: none;
+}
+
+.zone-name {
+  font-size: 12px;
+  color: #bf360c;
+}
+
+.zone-risk {
+  font-size: 11px;
+  color: #e65100;
+  font-weight: 500;
+}
+
+/* 상세 통계 */
+.detailed-stats {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.detailed-stats h4 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stats-section {
+  background: white;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.stats-section h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.intensity-info {
+  text-align: center;
+}
+
+.intensity-level {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.intensity-desc {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+}
+
+.intensity-rec {
+  font-size: 11px;
+  color: #888;
+  margin: 0;
+}
+
+.calorie-info {
+  text-align: center;
+}
+
+.calorie-main {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e65100;
+  margin-bottom: 6px;
+}
+
+.calorie-equivalents {
+  font-size: 10px;
+  color: #666;
+  line-height: 1.3;
+}
+
+.achievement-info {
+  text-align: center;
+}
+
+.achievement-score {
+  font-size: 20px;
+  font-weight: 600;
+  color: #4caf50;
+  margin-bottom: 4px;
+}
+
+.achievement-grade {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.daily-progress {
+  font-size: 11px;
+  color: #2196f3;
+  font-weight: 500;
+}
+
+.improvement-tips {
+  background: white;
+  border-radius: 6px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+}
+
+.improvement-tips h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #444;
+}
+
+.improvement-tips ul {
+  margin: 0 0 10px 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: #666;
+}
+
+.improvement-tips li {
+  margin-bottom: 4px;
+}
+
+.next-goal {
+  text-align: center;
+  padding: 8px;
+  background: #e3f2fd;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #1565c0;
+}
+
+/* 운동 지역 섹션 */
+.exercise-areas-section {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e9ecef;
+}
+
+.exercise-areas-section h3 {
+  margin: 0 0 16px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.areas-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.area-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.area-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.area-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.area-header h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.area-type {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.area-type.park {
+  background: #c8e6c9;
+  color: #2e7d32;
+}
+
+.area-type.river {
+  background: #bbdefb;
+  color: #1565c0;
+}
+
+.area-type.stream {
+  background: #b3e5fc;
+  color: #0277bd;
+}
+
+.area-type.mountain {
+  background: #d7ccc8;
+  color: #5d4037;
+}
+
+.area-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.area-detail {
+  font-size: 11px;
+  color: #666;
+}
+
+.area-facilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.facility-tag {
+  font-size: 9px;
+  background: #e1f5fe;
+  color: #0277bd;
+  padding: 2px 4px;
+  border-radius: 8px;
+}
+
+.area-select-btn {
+  width: 100%;
+  padding: 6px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.area-select-btn:hover {
+  background: #1976d2;
+}
+
+/* 지도 컨테이너 */
+.map-container {
+  flex: 1;
+  position: relative;
+  background: #f0f0f0;
+}
+
+.map-container .leaflet-container {
+  height: 100% !important;
+  width: 100% !important;
+}
+
+/* 하단 정보 패널 */
+.bottom-info {
+  position: absolute;
+  bottom: 0;
+  left: 400px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid #e0e6ed;
+  padding: 16px;
+  display: flex;
+  gap: 20px;
+  z-index: 1000;
+}
+
+.info-section {
+  flex: 1;
+}
+
+.info-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.guide-item {
+  background: white;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.guide-item h4 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.guide-item p {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.tips-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.tips-list li {
+  font-size: 13px;
+  color: #555;
+  padding: 8px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e6ed;
+}
+
+/* 팝업 스타일 */
+.popup-facilities {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.popup-facilities strong {
+  color: #2c3e50;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .exercise-route {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .exercise-panel {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .map-container {
+    height: 50vh;
+  }
+
+  .bottom-info {
+    position: static;
+    left: auto;
+    right: auto;
+    flex-direction: column;
+  }
+
+  .guide-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tips-list {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .rec-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .exercise-panel {
+    padding: 16px;
+  }
+
+  .exercise-panel h2 {
+    font-size: 20px;
+  }
+
+  .preset-buttons {
+    justify-content: center;
+  }
+
+  .preset-btn {
+    flex: 1;
+    min-width: 60px;
+  }
+
+  .exercise-tabs {
+    flex-direction: column;
+  }
+
+  .stats-section {
+    padding: 8px;
+  }
+}
+
+/* 로딩 애니메이션 */
+.generate-btn:disabled {
+  position: relative;
+  overflow: hidden;
+}
+
+.generate-btn:disabled::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* 스크롤바 스타일 */
+.exercise-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.exercise-panel::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.exercise-panel::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.exercise-panel::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 부드러운 전환 효과 */
+.route-result,
+.recommendations-section,
+.detailed-stats,
+.exercise-areas-section {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 호버 효과 개선 */
+.stat-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.benefit-tag:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* 접근성 개선 */
+.tab-btn:focus,
+.generate-btn:focus,
+.recommendation-btn:focus,
+.area-select-btn:focus {
+  outline: 2px solid #3498db;
+  outline-offset: 2px;
+}
+
+.radio-option:focus-within,
+.checkbox-option:focus-within {
+  background: #f0f8ff;
+  outline: 1px solid #3498db;
+}
