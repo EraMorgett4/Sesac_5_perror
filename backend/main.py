@@ -1535,10 +1535,22 @@ async def get_walking_route(route_request: RouteRequest):
                 status_code=400, detail=result.get("error", "경로를 찾을 수 없습니다.")
             )
 
+        # --- 여기부터 수정 ---
+
+        # API가 제공하는 duration 대신, 거리를 기반으로 직접 도보 시간을 계산합니다.
+        # result["distance"]는 미터(m) 단위라고 가정합니다.
+
+        # 1. 성인 평균 보행 속도를 설정합니다. (예: 분속 75m = 시속 4.5km)
+        #    더 여유롭게 계산하고 싶다면 60~70 사이의 값으로 조절할 수 있습니다.
+        WALKING_SPEED_MPM = 60  # Meters Per Minute (분속)
+
+        # 2. 거리(m)를 분속(m/min)으로 나누어 예상 소요 시간(분)을 계산합니다.
+        estimated_walking_time = int(result["distance"] / WALKING_SPEED_MPM)
+
         return RouteResponse(
             waypoints=[{"lat": wp[0], "lng": wp[1]} for wp in result["waypoints"]],
             distance=result["distance"] / 1000,  # km로 변환
-            estimated_time=int(result["duration"] / 60),  # 분으로 변환
+            estimated_time=estimated_walking_time,  # 새로 계산된 도보 시간(분)으로 교체
             route_type="walking",
             avoided_zones=[],
             steps=result.get("steps", []),
@@ -1546,7 +1558,8 @@ async def get_walking_route(route_request: RouteRequest):
         )
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"경로 생성 오류: {str(e)}")
+        # 실제 운영시에는 로깅(logging)을 통해 에러를 기록하는 것이 좋습니다.
+        raise HTTPException(status_code=500, detail=f"서버 내부 오류: {e}")
 
 
 @app.post("/safe-walking-route", response_model=RouteResponse)
@@ -1593,6 +1606,15 @@ async def get_safe_walking_route(route_request: RouteRequest):
                 status_code=400, detail=result.get("error", "경로를 찾을 수 없습니다.")
             )
 
+        # --- 여기부터 수정 ---
+
+        # 1. 성인 평균 보행 속도를 설정합니다. (예: 분속 75m = 시속 4.5km)
+        WALKING_SPEED_MPM = 60  # Meters Per Minute (분속)
+
+        # 2. 거리(m)를 분속(m/min)으로 나누어 예상 소요 시간(분)을 계산합니다.
+        #    result["distance"]는 미터(m) 단위라고 가정합니다.
+        estimated_walking_time = int(result["distance"] / WALKING_SPEED_MPM)
+
         # 메시지 개선
         message = result.get("message", "안전한 도보 경로가 생성되었습니다.")
         avoided_constructions = len(
@@ -1604,7 +1626,7 @@ async def get_safe_walking_route(route_request: RouteRequest):
         return RouteResponse(
             waypoints=[{"lat": wp[0], "lng": wp[1]} for wp in result["waypoints"]],
             distance=result["distance"] / 1000,  # km로 변환
-            estimated_time=int(result["duration"] / 60),  # 분으로 변환
+            estimated_time=estimated_walking_time,  # 새로 계산된 도보 시간(분)으로 교체
             route_type=result.get("route_type", "walking"),
             avoided_zones=result.get("avoided_zones", []),
             steps=result.get("steps", []),
