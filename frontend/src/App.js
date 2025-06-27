@@ -14,6 +14,8 @@ import Dashboard from './pages/Dashboard';
 import RiskMap from './pages/RiskMap';
 import RouteSearch from './pages/RouteSearch';
 import ReportChatbot from './pages/ReportChatbot'; // 새로 추가
+import AzureMLTest from './pages/AzureMltest';
+import NotFound from './pages/NotFound'; // 404 페이지 import
 import './styles/App.css';
 import VoiceAssistantWidget from './components/VoiceAssistantWidget';
 
@@ -31,10 +33,15 @@ function App() {
               <Route path="/map" element={<RiskMap />} />
               <Route path="/route" element={<RouteSearch />} />
               <Route path="/report" element={<ReportChatbot />} /> {/* 신고 페이지 추가 */}
+              <Route path="/azuremltest" element={<AzureMLTest />} /> 
+              
               
               
 
               <Route path="/" element={<Navigate to="/dashboard" />} />
+
+   
+              <Route path="*" element={<NotFound />} />
             </Routes>
             <VoiceAssistantWidget />
           </main>

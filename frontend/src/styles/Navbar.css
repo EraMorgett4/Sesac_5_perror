@@ -19,6 +19,7 @@
   font-weight: bold;
   color: white;
   text-decoration: none;
+  min-width: 320px;
 }
 
 .nav-logo:hover {
@@ -36,6 +37,7 @@
   text-decoration: none;
   padding: 8px 16px;
   border-radius: 4px;
+  min-width: 92px;
   transition: background-color 0.3s;
 }
 
