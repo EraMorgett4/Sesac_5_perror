@@ -64,6 +64,7 @@
 ### 06/24
 
 - 오병주
+
   - Chore: requirements.txt 업데이트 openai사용에 필요한 라이브러리 추가
   - Style: 신고페이지용 css 추가
   - Add: 신고페이지 화면 추가
@@ -74,6 +75,7 @@
   - Chore: requirements.txt 스피치 서비스용 라이브러리 업데이트
 
 - 전호연
+
   - Add: FR-007 Azure Custom Vision으로 이미지 트레이닝 후 개체 감지 테스트
 
 - 황선우
@@ -86,13 +88,14 @@
   - Chore : 파일 경로 변경
   - Docs : gitignore 내용 수정
   - Add : 데이터 전처리(도로공사데이터) 기능 추가
-  - Add : FR-005 기능 추가 
+  - Add : FR-005 기능 추가
   - Chore : 구동 확인 위한 임시 환경 구성
   - Chore : 임시환경 파일삭제
 
 ### 06/26
 
 - 황선우
+
   - Refactor : ipynb 파일 수정 및 병렬화 진행
   - Chore : 파일 경로 수정 및 삭제
   - Add : 데이터 종합 처리 관련 파일 추가
@@ -101,7 +104,9 @@
   - Add : 기능 추가 (FR-010)
 
 ### 06/27
+
 - 오병주
+
   - Docs: 공사구간 정보 데이터 추가
   - Chore: postgresql 마이그레이션 준비
   - Chore: requirements.txt 필요한 라이브러리 추가
@@ -110,3 +115,11 @@
   - Style: 디자인 통일성
   - Add: 산책로 추천기능 추가
   - Fix: 사람걷는속도 시속 3.6정도로 조정
+
+- 황선우
+  - add : mlstudio의 통신되도록 코드 추가
+  - feat : mlservice 통신을 위한 코드 추가
+  - chore : 통신 위한 영역별 코드 수정
+  - style : 404페이지, mlservice 통신 페이지 css 추가
+  - add : 404페이지, mlservice 통신 페이지 추가 및 경로 설정
+  - style : CSS 수정 및 UI 개선
