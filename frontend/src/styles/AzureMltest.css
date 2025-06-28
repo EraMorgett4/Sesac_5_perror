@@ -4,7 +4,7 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* 페이지 헤더 */
@@ -69,7 +69,7 @@
   gap: 10px;
 }
 
-.location-info p {
+.location-info .loc {
   margin: 0;
   font-size: 1rem;
   color: #555;
@@ -159,8 +159,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-display p {
@@ -410,39 +414,39 @@
   .azure-ml-test {
     padding: 15px;
   }
-  
+
   .page-header {
     padding: 20px;
   }
-  
+
   .page-header h1 {
     font-size: 2rem;
   }
-  
+
   .test-buttons {
     grid-template-columns: 1fr;
   }
-  
+
   .summary-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .probability-item {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  
+
   .level-name {
     min-width: auto;
   }
-  
+
   .history-header {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  
+
   .history-details {
     flex-direction: column;
     gap: 8px;
