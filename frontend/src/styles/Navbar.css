@@ -2,7 +2,7 @@
   background-color: #2c3e50;
   color: white;
   padding: 1rem 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .nav-container {
@@ -19,6 +19,13 @@
   font-weight: bold;
   color: white;
   text-decoration: none;
+  min-width: 320px;
+}
+
+.nav-logo-img {
+  width: 10%;
+  vertical-align: middle;
+  margin-right: 10px;
 }
 
 .nav-logo:hover {
@@ -34,8 +41,10 @@
 .nav-link {
   color: white;
   text-decoration: none;
+  text-align: center;
   padding: 8px 16px;
   border-radius: 4px;
+  min-width: 92px;
   transition: background-color 0.3s;
 }
 

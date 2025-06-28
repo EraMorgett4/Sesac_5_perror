@@ -25,6 +25,7 @@ import traceback
 import subprocess
 import pandas as pd
 import csv
+import json
 import shutil
 from pathlib import Path
 from exercise_route_service import exercise_route_service
@@ -51,6 +52,9 @@ from auth import (
     get_current_user,
 )
 from speech_service import speech_service
+from azure_ml_service import azure_ml_predictor
+from location_analyzer import convert_coordinates_to_features
+
 
 # 환경변수 로드
 load_dotenv()
@@ -221,6 +225,466 @@ class StepsCalculatorResponse(BaseModel):
     user_height_cm: int
     stride_length_cm: float
     walking_time_minutes: int
+
+
+# ============================================================================
+# Azure ML 연동을 위한 Pydantic 모델 (기존 모델들 다음에 추가)
+# ============================================================================
+
+
+class LocationInput(BaseModel):
+    latitude: float
+    longitude: float
+    location_name: Optional[str] = "현재 위치"
+
+
+class RiskAnalysisRequest(BaseModel):
+    location: LocationInput
+    analysis_radius_km: Optional[float] = 0.2
+
+
+@app.post("/analyze-current-location")
+async def analyze_current_location_risk(request: RiskAnalysisRequest):
+    """현재 위치 기반 Azure ML 위험도 분석 (모듈화 버전)"""
+    try:
+        print(f"\n" + "=" * 60)
+        print(f"🎯 Azure ML 위험도 분석 요청")
+        print(f"📍 위치: {request.location.location_name}")
+        print(f"📊 좌표: ({request.location.latitude}, {request.location.longitude})")
+        print(f"📏 분석반경: {request.analysis_radius_km}km")
+        print(f"=" * 60)
+
+        # 1단계: 좌표를 Azure ML 피처로 변환 (모듈화된 함수 사용)
+        location_features = convert_coordinates_to_features(
+            target_lat=request.location.latitude,
+            target_lng=request.location.longitude,
+            construction_data=CONSTRUCTION_DATA,  # 기존 전역 변수 사용
+            risk_zones=DUMMY_RISK_ZONES,  # 기존 전역 변수 사용
+            location_name=request.location.location_name,
+            radius_km=request.analysis_radius_km,
+        )
+
+        if not location_features:
+            print(f"❌ 피처 변환 실패")
+            raise HTTPException(
+                status_code=400, detail="좌표를 분석 피처로 변환하는데 실패했습니다"
+            )
+
+        # 2단계: Azure ML 예측 요청 (모듈화된 서비스 사용)
+        print(f"\n🤖 Azure ML 예측 요청 시작...")
+        prediction_result = await azure_ml_predictor.predict_risk(location_features)
+
+        if not prediction_result["success"]:
+            print(f"❌ Azure ML 예측 실패: {prediction_result.get('error')}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Azure ML 예측 실패: {prediction_result.get('error')}",
+            )
+
+        # 3단계: 결과 파싱 및 콘솔 출력
+        azure_response = prediction_result["prediction"]
+
+        print(f"\n📥 Azure ML 응답 분석:")
+        print(f"  📊 응답 구조: {list(azure_response.keys())}")
+
+        if "Results" in azure_response:
+            print(f"  📋 Results 키 존재: {list(azure_response['Results'].keys())}")
+
+            if "WebServiceOutput0" in azure_response["Results"]:
+                predictions = azure_response["Results"]["WebServiceOutput0"][0]
+                print(f"  🎯 예측 결과 키들: {list(predictions.keys())}")
+
+                # 주요 결과 추출
+                predicted_category = predictions.get("Scored Labels", "알 수 없음")
+                probabilities = {
+                    "최저위험": predictions.get("Scored Probabilities_최저위험", 0),
+                    "하위험": predictions.get("Scored Probabilities_하위험", 0),
+                    "중위험": predictions.get("Scored Probabilities_중위험", 0),
+                    "최고위험": predictions.get("Scored Probabilities_최고위험", 0),
+                }
+
+                # 결과 콘솔 출력
+                print(f"\n🎉 === Azure ML 분석 결과 ===")
+                print(f"📍 분석 위치: {request.location.location_name}")
+                print(f"🏷️ 예측된 위험 등급: {predicted_category}")
+                print(f"📊 각 등급별 확률:")
+                for level, prob in probabilities.items():
+                    print(f"  - {level}: {prob*100:.1f}%")
+
+                max_prob_class = max(probabilities.items(), key=lambda x: x[1])
+                confidence = max_prob_class[1] * 100
+                print(f"🎯 신뢰도: {confidence:.1f}%")
+
+                print(f"\n📈 입력 피처 요약:")
+                print(
+                    f"  🚧 주변 공사장: {location_features.get('nearby_construction_count', 0)}개"
+                )
+                print(
+                    f"  🕳️ 주변 위험지역: {location_features.get('nearby_sinkhole_count', 0)}개"
+                )
+                print(
+                    f"  👥 일일 유동인구: {location_features.get('avg_daily_visitors', 0):,.0f}명"
+                )
+                print(f"  ☔ 강수량: {location_features.get('avg_rainfall', 0)}mm")
+                print(
+                    f"  🎯 최종 위험점수: {location_features.get('final_risk_score', 0)}"
+                )
+
+                print(f"=" * 60)
+
+                # 간단한 응답 반환
+                return {
+                    "success": True,
+                    "message": "Azure ML 분석 완료 - 콘솔을 확인하세요",
+                    "location": request.location.location_name,
+                    "predicted_category": predicted_category,
+                    "confidence": f"{confidence:.1f}%",
+                    "probabilities": {
+                        k: f"{v*100:.1f}%" for k, v in probabilities.items()
+                    },
+                    "feature_summary": {
+                        "constructions": location_features.get(
+                            "nearby_construction_count", 0
+                        ),
+                        "risk_zones": location_features.get("nearby_sinkhole_count", 0),
+                        "population": location_features.get("avg_daily_visitors", 0),
+                        "risk_score": location_features.get("final_risk_score", 0),
+                    },
+                }
+            else:
+                print(f"❌ WebServiceOutput0 키가 없습니다")
+                raise HTTPException(status_code=500, detail="Azure ML 응답 형식 오류")
+        else:
+            print(f"❌ Results 키가 없습니다")
+            raise HTTPException(status_code=500, detail="Azure ML 응답 형식 오류")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ 전체 오류 발생: {e}")
+        print(f"📄 오류 상세: {traceback.format_exc()}")
+        raise HTTPException(
+            status_code=500, detail=f"위험도 분석 중 오류가 발생했습니다: {str(e)}"
+        )
+
+
+# main.py에서 기존 test-azure-ml 엔드포인트를 이것으로 교체하세요
+
+
+@app.get("/test-azure-ml")
+async def test_azure_ml_with_location(
+    latitude: Optional[float] = None,
+    longitude: Optional[float] = None,
+    location_name: Optional[str] = None,
+):
+    """Azure ML 기능 테스트 (실제 현재 위치 또는 기본 위치 사용)"""
+    try:
+        print(f"\n🧪 Azure ML 테스트 시작")
+
+        # 1. 위치 정보 결정
+        if latitude is not None and longitude is not None:
+            # 사용자가 제공한 위치 사용
+            test_lat = latitude
+            test_lng = longitude
+            test_location_name = (
+                location_name or f"사용자 위치 ({latitude:.4f}, {longitude:.4f})"
+            )
+            print(f"📍 사용자 제공 위치 사용: {test_location_name}")
+        else:
+            # 기본 테스트 위치 (강남역) 사용
+            test_lat = 37.4979
+            test_lng = 127.0276
+            test_location_name = "강남역 (기본 테스트)"
+            print(f"📍 기본 테스트 위치 사용: {test_location_name}")
+
+        print(f"📊 테스트 좌표: ({test_lat:.6f}, {test_lng:.6f})")
+
+        # 2. 위치 유효성 검사 (서울 지역 확인)
+        if not (37.4 <= test_lat <= 37.7 and 126.7 <= test_lng <= 127.2):
+            print(f"⚠️ 경고: 서울 지역 외 좌표입니다")
+            print(f"   - 서울 범위: 위도 37.4-37.7, 경도 126.7-127.2")
+            print(f"   - 입력 좌표: 위도 {test_lat}, 경도 {test_lng}")
+
+            return {
+                "success": False,
+                "message": "서울 지역 외 좌표는 지원하지 않습니다",
+                "input_coordinates": {
+                    "latitude": test_lat,
+                    "longitude": test_lng,
+                    "location_name": test_location_name,
+                },
+                "error": "좌표가 서울 지역 범위를 벗어났습니다",
+                "seoul_bounds": {
+                    "latitude_range": "37.4 - 37.7",
+                    "longitude_range": "126.7 - 127.2",
+                },
+            }
+
+        # 3. Azure ML 분석 요청 생성
+        test_request = RiskAnalysisRequest(
+            location=LocationInput(
+                latitude=test_lat, longitude=test_lng, location_name=test_location_name
+            ),
+            analysis_radius_km=0.1,  # 100m 반경
+        )
+
+        print(f"🎯 분석 반경: 100m")
+        print(f"🔄 Azure ML 분석 시작...")
+
+        # 4. Azure ML 분석 실행
+        result = await analyze_current_location_risk(test_request)
+
+        # 5. 성공 응답
+        print(f"🎉 Azure ML 테스트 완료!")
+
+        return {
+            "success": True,
+            "message": "Azure ML 테스트 완료 - 콘솔 출력을 확인하세요",
+            "test_info": {
+                "location_name": test_location_name,
+                "coordinates": {"latitude": test_lat, "longitude": test_lng},
+                "analysis_radius_km": 0.1,
+                "location_source": (
+                    "user_provided"
+                    if (latitude is not None and longitude is not None)
+                    else "default_test"
+                ),
+            },
+            "azure_ml_result": result,
+            "modules_used": ["azure_ml_service", "location_analyzer"],
+            "console_output": "상세한 분석 과정은 서버 콘솔을 확인하세요",
+        }
+
+    except Exception as e:
+        print(f"❌ 테스트 실패: {e}")
+        print(f"📄 오류 상세: {traceback.format_exc()}")
+
+        return {
+            "success": False,
+            "message": "Azure ML 테스트 실패",
+            "test_info": {
+                "location_name": (
+                    test_location_name
+                    if "test_location_name" in locals()
+                    else "Unknown"
+                ),
+                "coordinates": {
+                    "latitude": test_lat if "test_lat" in locals() else None,
+                    "longitude": test_lng if "test_lng" in locals() else None,
+                },
+            },
+            "error": str(e),
+            "error_type": type(e).__name__,
+        }
+
+
+# 추가: 현재 위치 기반 빠른 테스트를 위한 POST 엔드포인트
+@app.post("/test-azure-ml-location")
+async def test_azure_ml_with_post_location(
+    latitude: float, longitude: float, location_name: str = "사용자 현재 위치"
+):
+    """POST 방식으로 현재 위치 기반 Azure ML 테스트"""
+    try:
+        print(f"\n🧪 POST 방식 Azure ML 테스트 시작")
+        print(f"📍 받은 위치: {location_name}")
+        print(f"📊 좌표: ({latitude:.6f}, {longitude:.6f})")
+
+        # GET 방식 테스트 함수 재사용
+        result = await test_azure_ml_with_location(
+            latitude=latitude, longitude=longitude, location_name=location_name
+        )
+
+        return result
+
+    except Exception as e:
+        print(f"❌ POST 테스트 실패: {e}")
+        return {
+            "success": False,
+            "message": "POST 방식 Azure ML 테스트 실패",
+            "error": str(e),
+        }
+
+
+# 추가: 브라우저에서 현재 위치 테스트를 위한 HTML 페이지
+@app.get("/test-location-page")
+async def test_location_page():
+    """브라우저에서 현재 위치 기반 Azure ML 테스트 페이지"""
+    html_content = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Azure ML 현재 위치 테스트</title>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .container { max-width: 800px; margin: 0 auto; }
+            .button { background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; margin: 8px; }
+            .button:hover { background: #0056b3; }
+            .result { background: #f8f9fa; padding: 20px; border-radius: 4px; margin: 20px 0; white-space: pre-wrap; }
+            .loading { color: #007bff; }
+            .error { color: #dc3545; }
+            .success { color: #28a745; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🤖 Azure ML 현재 위치 테스트</h1>
+            <p>이 페이지에서 현재 위치를 기반으로 Azure ML 위험도 분석을 테스트할 수 있습니다.</p>
+            
+            <div>
+                <button class="button" onclick="testCurrentLocation()">📍 현재 위치로 테스트</button>
+                <button class="button" onclick="testGangnamLocation()">🏢 강남역으로 테스트</button>
+                <button class="button" onclick="testSeoulCityHall()">🏛️ 서울시청으로 테스트</button>
+                <button class="button" onclick="clearResults()">🧹 결과 지우기</button>
+            </div>
+            
+            <div id="status"></div>
+            <div id="result" class="result" style="display:none;"></div>
+        </div>
+
+        <script>
+            function setStatus(message, className = '') {
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = message;
+                statusDiv.className = className;
+            }
+
+            function showResult(data) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = JSON.stringify(data, null, 2);
+                resultDiv.style.display = 'block';
+            }
+
+            function clearResults() {
+                document.getElementById('result').style.display = 'none';
+                setStatus('');
+            }
+
+            async function testCurrentLocation() {
+                setStatus('📍 현재 위치 확인 중...', 'loading');
+                
+                if (!navigator.geolocation) {
+                    setStatus('❌ 이 브라우저는 위치 서비스를 지원하지 않습니다.', 'error');
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        
+                        setStatus(`📍 현재 위치: (${lat.toFixed(6)}, ${lng.toFixed(6)}) - Azure ML 분석 중...`, 'loading');
+                        
+                        try {
+                            const response = await fetch(`/test-azure-ml?latitude=${lat}&longitude=${lng}&location_name=현재 위치`);
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                setStatus('✅ Azure ML 테스트 성공! 서버 콘솔도 확인하세요.', 'success');
+                            } else {
+                                setStatus(`❌ 테스트 실패: ${result.error || result.message}`, 'error');
+                            }
+                            showResult(result);
+                            
+                        } catch (error) {
+                            setStatus(`❌ API 호출 실패: ${error.message}`, 'error');
+                        }
+                    },
+                    (error) => {
+                        setStatus(`❌ 위치 정보 오류: ${error.message}`, 'error');
+                    }
+                );
+            }
+
+            async function testGangnamLocation() {
+                setStatus('🏢 강남역 위치로 Azure ML 테스트 중...', 'loading');
+                
+                try {
+                    const response = await fetch('/test-azure-ml?latitude=37.4979&longitude=127.0276&location_name=강남역');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        setStatus('✅ 강남역 테스트 성공!', 'success');
+                    } else {
+                        setStatus(`❌ 테스트 실패: ${result.error || result.message}`, 'error');
+                    }
+                    showResult(result);
+                    
+                } catch (error) {
+                    setStatus(`❌ API 호출 실패: ${error.message}`, 'error');
+                }
+            }
+
+            async function testSeoulCityHall() {
+                setStatus('🏛️ 서울시청 위치로 Azure ML 테스트 중...', 'loading');
+                
+                try {
+                    const response = await fetch('/test-azure-ml?latitude=37.5665&longitude=126.9780&location_name=서울시청');
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        setStatus('✅ 서울시청 테스트 성공!', 'success');
+                    } else {
+                        setStatus(`❌ 테스트 실패: ${result.error || result.message}`, 'error');
+                    }
+                    showResult(result);
+                    
+                } catch (error) {
+                    setStatus(`❌ API 호출 실패: ${error.message}`, 'error');
+                }
+            }
+        </script>
+    </body>
+    </html>
+    """
+
+    from fastapi.responses import HTMLResponse
+
+    return HTMLResponse(content=html_content)
+
+
+# 추가 테스트 엔드포인트: 여러 위치 한번에 테스트
+@app.get("/test-multiple-locations")
+async def test_multiple_locations():
+    """여러 위치 한번에 테스트"""
+    test_locations = [
+        {"name": "강남역", "lat": 37.4979, "lng": 127.0276},
+        {"name": "서울시청", "lat": 37.5665, "lng": 126.9780},
+        {"name": "홍대입구", "lat": 37.5572, "lng": 126.9245},
+    ]
+
+    results = []
+
+    for location in test_locations:
+        try:
+            print(f"\n🎯 {location['name']} 분석 시작...")
+
+            test_request = RiskAnalysisRequest(
+                location=LocationInput(
+                    latitude=location["lat"],
+                    longitude=location["lng"],
+                    location_name=location["name"],
+                ),
+                analysis_radius_km=0.1,
+            )
+
+            result = await analyze_current_location_risk(test_request)
+            results.append(
+                {"location": location["name"], "success": True, "result": result}
+            )
+
+        except Exception as e:
+            print(f"❌ {location['name']} 분석 실패: {e}")
+            results.append(
+                {"location": location["name"], "success": False, "error": str(e)}
+            )
+
+    return {
+        "message": "다중 위치 테스트 완료",
+        "results": results,
+        "total_tested": len(test_locations),
+        "success_count": len([r for r in results if r["success"]]),
+    }
 
 
 # =============================================================================

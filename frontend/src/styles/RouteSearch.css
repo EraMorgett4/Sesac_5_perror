@@ -2,11 +2,12 @@
 .route-search {
   height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
   padding: 20px;
   display: grid;
   grid-template-columns: 400px 1fr;
   gap: 20px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -519,16 +520,16 @@
     padding: 15px;
     height: 100vh;
   }
-  
+
   .search-panel {
     height: 100%;
     padding: 20px;
   }
-  
+
   .map-container {
     height: 100%;
   }
-  
+
   .route-summary {
     grid-template-columns: 1fr;
   }
@@ -539,23 +540,23 @@
     padding: 10px;
     grid-template-rows: 45vh 1fr;
   }
-  
+
   .search-panel {
     padding: 15px;
   }
-  
+
   .search-panel h2 {
     font-size: 24px;
   }
-  
+
   .input-with-suggestions {
     flex-direction: column;
   }
-  
+
   .current-location-btn {
     width: 100%;
   }
-  
+
   .tab-btn {
     padding: 10px 15px;
     font-size: 13px;
@@ -568,25 +569,25 @@
     gap: 10px;
     padding: 8px;
   }
-  
+
   .search-panel {
     padding: 12px;
   }
-  
+
   .search-panel h2 {
     font-size: 20px;
     margin-bottom: 15px;
   }
-  
+
   .route-type-selector {
     padding: 15px;
     margin-bottom: 15px;
   }
-  
+
   .route-summary {
     gap: 10px;
   }
-  
+
   .route-stat {
     padding: 12px;
   }
@@ -599,7 +600,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  
+
   .search-btn:hover:not(:disabled),
   .current-location-btn:hover:not(:disabled),
   .details-toggle-btn:hover,
@@ -614,12 +615,12 @@
     background: white;
     border: 2px solid #000;
   }
-  
+
   .route-info {
     background: white;
     border: 2px solid #000;
   }
-  
+
   .search-input-container input:focus {
     border-color: #000;
     box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1);
@@ -628,8 +629,13 @@
 
 /* 로딩 애니메이션 */
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .search-btn:disabled {
@@ -705,7 +711,7 @@
 
 .map-container .leaflet-popup-content {
   margin: 15px !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif !important;
 }
 
 .map-container .leaflet-popup-content h4 {
@@ -724,8 +730,6 @@
   color: #6c757d !important;
   font-size: 11px !important;
 }
-
-
 
 /* =============================================================================
    추천 산책로 패널 스타일
@@ -788,12 +792,24 @@
   color: #fff;
 }
 
-.course-type.park { background-color: #27ae60; }
-.course-type.river { background-color: #2980b9; }
-.course-type.stream { background-color: #1abc9c; }
-.course-type.mountain { background-color: #d35400; }
-.course-type.trail { background-color: #8e44ad; }
-.course-type.history { background-color: #7f8c8d; }
+.course-type.park {
+  background-color: #27ae60;
+}
+.course-type.river {
+  background-color: #2980b9;
+}
+.course-type.stream {
+  background-color: #1abc9c;
+}
+.course-type.mountain {
+  background-color: #d35400;
+}
+.course-type.trail {
+  background-color: #8e44ad;
+}
+.course-type.history {
+  background-color: #7f8c8d;
+}
 
 .course-distance {
   font-size: 0.8em;
@@ -870,5 +886,5 @@
 .tab-btn.active {
   background-color: #ffffff;
   color: #3498db;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
