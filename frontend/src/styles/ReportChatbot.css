@@ -368,6 +368,7 @@
   color: white !important;
   padding: 8px 15px;
   border-radius: 20px;
+  min-width: 116px;
   font-weight: 600;
   transition: all 0.3s ease;
 }
