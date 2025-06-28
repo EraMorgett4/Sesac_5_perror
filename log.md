@@ -123,3 +123,8 @@
   - style : 404페이지, mlservice 통신 페이지 css 추가
   - add : 404페이지, mlservice 통신 페이지 추가 및 경로 설정
   - style : CSS 수정 및 UI 개선
+  - add : 로고 이미지 추가 및 경로 생성
+  - style : 로고 크기 지정 및 nav-bar 조정
+  - style : 페이지 테두리 라운드 추가 및 css 수정
+  - fix : html 메타태그 수정 및 favicon 추가
+  - style : azuremltest페이지가 dashboard 설정과 공유하던 이슈 수정
