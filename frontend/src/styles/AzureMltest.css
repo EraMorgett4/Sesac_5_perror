@@ -1,0 +1,450 @@
+/* frontend/src/styles/AzureMLTest.css */
+
+.azure-ml-test {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 페이지 헤더 */
+.page-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.page-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+}
+
+.page-header p {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* 메인 컨테이너 */
+.test-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* 섹션 공통 스타일 */
+.location-section,
+.test-buttons-section,
+.result-section,
+.history-section,
+.usage-guide {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+}
+
+.location-section h2,
+.test-buttons-section h2,
+.result-section h2,
+.history-section h2,
+.usage-guide h2 {
+  margin: 0 0 20px 0;
+  font-size: 1.4rem;
+  color: #333;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 8px;
+}
+
+/* 현재 위치 정보 */
+.location-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.location-info p {
+  margin: 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.location-loading {
+  text-align: center;
+  padding: 20px;
+}
+
+.location-loading p {
+  margin-bottom: 15px;
+  color: #666;
+}
+
+/* 버튼 스타일 */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4);
+}
+
+/* 테스트 버튼들 */
+.test-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.test-btn {
+  padding: 15px 20px;
+  font-size: 1.1rem;
+  min-height: 60px;
+}
+
+/* 로딩 표시 */
+.loading-display {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 10px;
+  border: 2px dashed #dee2e6;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-display p {
+  margin: 10px 0;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* 결과 카드 */
+.result-card {
+  border-radius: 12px;
+  padding: 25px;
+  margin-top: 15px;
+}
+
+.success-card {
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 1px solid #c3e6cb;
+}
+
+.error-card {
+  background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+  border: 1px solid #f5c6cb;
+}
+
+.result-card h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.3rem;
+}
+
+.result-header {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.result-header h4 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  color: #2c3e50;
+}
+
+.result-header p {
+  margin: 5px 0;
+  color: #555;
+}
+
+/* 위험도 표시 */
+.risk-score-display {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.risk-badge {
+  display: inline-block;
+  padding: 15px 30px;
+  border-radius: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.risk-category {
+  display: block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.confidence {
+  display: block;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+/* 확률 섹션 */
+.probabilities-section {
+  margin-bottom: 25px;
+}
+
+.probabilities-section h5 {
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.probabilities-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.probability-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.level-name {
+  min-width: 80px;
+  font-weight: 600;
+  color: #555;
+}
+
+.probability-bar {
+  flex: 1;
+  height: 25px;
+  background: #e9ecef;
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.3s ease;
+}
+
+.probability-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* 피처 요약 */
+.feature-summary h5 {
+  margin: 0 0 15px 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.summary-item .label {
+  font-weight: 600;
+  color: #555;
+}
+
+.summary-item .value {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* 콘솔 노트 */
+.console-note {
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.console-note p {
+  margin: 0;
+  color: #555;
+}
+
+/* 히스토리 섹션 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-item {
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.location-name {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.timestamp {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.status.success {
+  color: #28a745;
+}
+
+.status.error {
+  color: #dc3545;
+}
+
+.history-details {
+  display: flex;
+  gap: 20px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* 사용 안내 */
+.guide-content h3 {
+  margin: 20px 0 10px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.guide-content ul,
+.guide-content ol {
+  margin: 10px 0;
+  padding-left: 25px;
+}
+
+.guide-content li {
+  margin: 8px 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.guide-content strong {
+  color: #2c3e50;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .azure-ml-test {
+    padding: 15px;
+  }
+  
+  .page-header {
+    padding: 20px;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .test-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .probability-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .level-name {
+    min-width: auto;
+  }
+  
+  .history-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  
+  .history-details {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
