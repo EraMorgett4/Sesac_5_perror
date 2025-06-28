@@ -1,8 +1,8 @@
 // Navbar.js
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import '../styles/Navbar.css';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import "../styles/Navbar.css";
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -10,24 +10,31 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <nav className="navbar">
       <div className="nav-container">
         <Link to="/" className="nav-logo">
-          🕳️ Seoul Sinkhole Predictor
+          <img src="/images/logo.png" alt="이 길 어때? 로고" className="nav-logo-img" />
+          <span className="nav-logo-text">이 길 어때?</span>
         </Link>
-        
-        <div className="nav-menu">
-          <Link to="/dashboard" className="nav-link">대시보드</Link>
-          <Link to="/map" className="nav-link">위험지도</Link>
-          <Link to="/route" className="nav-link">안전경로</Link>
-          <Link to="/report" className="nav-link report-link">🚨 신고하기</Link>
 
-         
-          
+        <div className="nav-menu">
+          <Link to="/dashboard" className="nav-link">
+            대시보드
+          </Link>
+          <Link to="/map" className="nav-link">
+            위험지도
+          </Link>
+          <Link to="/route" className="nav-link">
+            안전경로
+          </Link>
+          <Link to="/report" className="nav-link report-link">
+            🚨 신고하기
+          </Link>
+
           {user ? (
             // 로그인된 상태
             <>
@@ -39,8 +46,12 @@ const Navbar = () => {
           ) : (
             // 로그인되지 않은 상태
             <>
-              <Link to="/login" className="nav-link">로그인</Link>
-              <Link to="/register" className="nav-link">회원가입</Link>
+              <Link to="/login" className="nav-link">
+                로그인
+              </Link>
+              <Link to="/register" className="nav-link">
+                회원가입
+              </Link>
             </>
           )}
         </div>
