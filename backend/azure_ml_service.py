@@ -14,9 +14,13 @@ logger = logging.getLogger(__name__)
 class AzureMLPredictor:
     def __init__(self):
         self.url = (
-            "http://20.249.185.24:80/api/v1/service/risk200-realtime-endpoint/score"
+            "http://20.249.185.24:80/api/v1/service/risk200-realtime-endpoint/score"  # Neural Network
+            # "http://20.249.185.24:80/api/v1/service/risk200-decisionforest-endpoit/score"  # Decision Forest
         )
-        self.api_key = "NPv48POoIswLdbyLiuoQUUcpX7xLYfca"
+        self.api_key = (
+            "NPv48POoIswLdbyLiuoQUUcpX7xLYfca"  # Neural Network
+            # "vAiTMXjDzaS8C3AoVRmwUeCLlAOVmKQq"  # Decision Forest
+        )
         self.headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
